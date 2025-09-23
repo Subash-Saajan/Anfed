@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Events from "./Pages/Events";
 import Home from "./Pages/Home";
+import Contact from "./Pages/Contact";
 import AdminLogin from "./Pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EventForm from "./components/EventForm";
@@ -16,6 +17,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
@@ -31,7 +33,6 @@ export default function App() {
         </Routes>
       </main>
 
-      {/* persistent admin bubble (visible on all pages) */}
       <AdminBubble />
     </BrowserRouter>
   );
