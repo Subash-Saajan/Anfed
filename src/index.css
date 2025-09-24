@@ -1,3 +1,41 @@
 @import "tailwindcss";
 
+/* Cinematic hero image animation (gif-like effect) */
+@keyframes cinematicPan {
+  0% {
+    transform: scale(1.15) translateX(-6%);
+  }
+  100% {
+    transform: scale(1) translateX(0%);
+  }
+}
 
+.cinematic-pan {
+  will-change: transform;
+}
+
+.cinematic-pan:hover {
+  animation: cinematicPan 6s ease-out forwards;
+}
+
+/* Cinematic zoom for cards on hover */
+.card-cinematic {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 400ms ease;
+  transform-origin: center;
+}
+
+.card-cinematic:hover {
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Banner hover zoom: ensure hover works even with overlay above the image */
+.hero-hover .cinematic-pan {
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(1);
+}
+
+.hero-hover:hover .cinematic-pan {
+  transform: scale(1.1);
+}
