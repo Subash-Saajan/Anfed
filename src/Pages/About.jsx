@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import Footer from "../components/Footer";
 
 export default function About() {
   // Simple team data for the carousel
@@ -164,8 +165,7 @@ export default function About() {
               style={{
                 background:
                   "linear-gradient(90deg, rgba(68,136,0,0.7) 0%, rgba(68,136,0,0) 100%)",
-              }}
-            >
+              }}>
               <h2 className="text-white text-xl md:text-2xl font-bold">
                 Our Team
               </h2>
@@ -183,20 +183,17 @@ export default function About() {
                   transition: transitionEnabled
                     ? "transform 300ms ease-out"
                     : "none",
-                }}
-              >
+                }}>
                 {slides.map((m, idx) => (
                   <div
                     key={idx}
-                    className="relative z-10 w-full shrink-0 px-0 overflow-visible"
-                  >
+                    className="relative z-10 w-full shrink-0 px-0 overflow-visible">
                     <div
                       className="relative overflow-visible rounded-2xl border border-slate-200 p-4 md:p-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-5 items-center pr-24 md:pr-32 lg:pr-40 md:min-h-64 lg:min-h-72"
                       style={{
                         background:
                           "linear-gradient(90deg, rgba(68,136,0,1) 0%, rgba(68,136,0,0.2) 100%), #ffffff",
-                      }}
-                    >
+                      }}>
                       {/* Text Section */}
                       <div className="md:col-span-2 text-slate-800">
                         <h3 className="text-2xl font-bold mb-1 text-slate-900">
@@ -229,8 +226,7 @@ export default function About() {
               onClick={prevTeam}
               aria-label="Previous team member"
               disabled={animating}
-              className="absolute -left-3 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
+              className="absolute -left-3 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed">
               ‹
             </button>
             <button
@@ -238,8 +234,7 @@ export default function About() {
               onClick={nextTeam}
               aria-label="Next team member"
               disabled={animating}
-              className="absolute -right-3 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
+              className="absolute -right-3 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed">
               ›
             </button>
 

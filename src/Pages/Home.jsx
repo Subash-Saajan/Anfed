@@ -1,4 +1,5 @@
 import bgImage from "../assets/banner.jpg"; // go up one folder, then assets
+import Footer from "../components/Footer.jsx";
 
 export default function Home() {
   return (
