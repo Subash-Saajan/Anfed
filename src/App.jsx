@@ -7,6 +7,7 @@ import AdminLogin from "./Pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EventForm from "./components/EventForm";
 import AdminBubble from "./components/AdminBubble";
+import About from "./Pages/About";
 import "./App.css";
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/events" element={<Events />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -24,7 +26,9 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <div className="p-6">
-                  <h1 className="text-xl font-bold mb-4">Admin — Create event</h1>
+                  <h1 className="text-xl font-bold mb-4">
+                    Admin — Create event
+                  </h1>
                   <EventForm />
                 </div>
               </ProtectedRoute>
