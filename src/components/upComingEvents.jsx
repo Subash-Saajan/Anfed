@@ -13,10 +13,10 @@ export default function UpComingEvents() {
       (snap) => {
         const docs = snap.docs.map((d) => {
           const data = d.data();
-          // normalize date and images to match your UI
           const date = data.date
-            ? // handle Firestore Timestamp or ISO/string
-              data.date.toDate ? data.date.toDate().toLocaleString() : new Date(data.date).toLocaleString()
+            ? data.date.toDate
+              ? data.date.toDate().toLocaleString()
+              : new Date(data.date).toLocaleString()
             : "";
           return {
             id: d.id,
@@ -24,7 +24,6 @@ export default function UpComingEvents() {
             date,
             location: data.location || "",
             mainImage: data.imageUrl || data.mainImage || "",
-            thumbImage: data.thumbImage || data.imageUrl || "",
             description: data.description || "",
           };
         });
@@ -43,48 +42,45 @@ export default function UpComingEvents() {
   if (!items.length) return <div className="p-4">No upcoming events.</div>;
 
   return (
-    <div className="space-y-4">
-      {items.map((ev) => (
+    <div className="space-y-8 ml-8 mr-8 mb-10 mt-10">
+      {items.map((ev, index) => (
         <article
           key={ev.id}
-          className="bg-white rounded-lg shadow-sm p-4 flex flex-col md:flex-row gap-4 items-start"
+          className={`bg-white rounded-lg  overflow-hidden flex flex-col md:flex-row ${
+            index % 2 === 1 ? "md:flex-row-reverse" : ""
+          } gap-6`}
         >
-          {/* Left: main image */}
+          {/* Image */}
           {ev.mainImage ? (
             <img
               src={ev.mainImage}
               alt={ev.title}
-              className="w-full md:w-48 h-40 md:h-40 object-cover rounded"
+              className="w-80 h-80 object-cover rounded-xl shadow-lg self-center md:self-auto"
             />
           ) : (
-            <div className="w-full md:w-48 h-40 md:h-40 bg-slate-100 rounded flex items-center justify-center text-sm text-slate-400">
+            <div className="w-60 h-60 bg-slate-100 flex items-center justify-center text-gray-400 rounded-xl">
               No image
             </div>
           )}
 
-          {/* Right: heading, small top-right image, description, CTA */}
-          <div className="flex-1 relative min-h-[160px]">
-            {/* small top-right thumbnail */}
-            {ev.thumbImage && (
-              <img
-                src={ev.thumbImage}
-                alt={`${ev.title} thumb`}
-                className="w-14 h-14 rounded-full border-2 border-white shadow absolute right-0 -mt-2"
-              />
-            )}
-
-            <div className="pr-4">
-              <h3 className="text-lg font-semibold text-gray-900">{ev.title}</h3>
-              <div className="text-sm text-gray-500">
+          {/* Content */}
+          <div className="flex-1 p-6 flex flex-col shadow-md justify-between border rounded-xl border-gray-200">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">{ev.title}</h3>
+              <p className="mt-2 text-gray-700">{ev.description}</p>
+              <p className="mt-2 text-sm text-gray-500">
                 {ev.date} {ev.location ? `· ${ev.location}` : ""}
-              </div>
-
-              <p className="mt-3 text-gray-700">{ev.description}</p>
+              </p>
             </div>
 
-            <div className="mt-4 flex justify-end">
-              <button className="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
-                Learn more
+            {/* Button → only first card right aligned */}
+            <div
+              className={`mt-4 flex ${
+                index === 0 ? "justify-end" : "justify-start"
+              }`}
+            >
+              <button className="bg-[#448800] font-bold rounded-full transform-gpu transition-transform duration-300 ease-out hover:scale-105 active:scale-100 focus:outline-none px-4 py-2 text-white text-center">
+                See More
               </button>
             </div>
           </div>

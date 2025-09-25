@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-<<<<<<< Updated upstream
 /* Cinematic hero image animation (gif-like effect) */
 @keyframes cinematicPan {
   0% {
@@ -40,8 +39,6 @@
 .hero-hover:hover .cinematic-pan {
   transform: scale(1.1);
 }
-=======
 :root {
   --brand: #448800;
 }
->>>>>>> Stashed changes

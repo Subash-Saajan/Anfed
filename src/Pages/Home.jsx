@@ -82,10 +82,10 @@ export default function Home() {
       </section>
 
       {/* Events Section */}
-      <section className="mt-10 ml-3 mr-3">
+      <section className="mt-15 ml-3 mr-3">
         <div className="flex items-center gap-3 mb-6">
-          <span className="h-[6px] w-12 bg-indigo-600"></span>
-          <h3 className="text-xl sm:text-2xl font-bold uppercase text-indigo-600 tracking-wide">
+          <span className="h-[6px] w-12 bg-[#448800]"></span>
+          <h3 className="text-xl sm:text-2xl font-bold uppercase text-[#448800] tracking-wide">
             Upcoming Events
           </h3>
         </div>
