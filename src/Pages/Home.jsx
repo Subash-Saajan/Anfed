@@ -1,4 +1,5 @@
-import bgImage from "../assets/banner.jpg"; // go up one folder, then assets
+import bgImage from "../assets/banner.jpg"; 
+import UpComingEvents from "../components/upComingEvents";
 import Footer from "../components/Footer.jsx";
 
 export default function Home() {
@@ -29,9 +30,9 @@ export default function Home() {
           </button>
         </div>
       </div>
+
       {/* Overview Section */}
       <section className="mt-10 ml-3 mr-3">
-        {/* Heading */}
         <div className="mb-6">
           <div className="flex items-center gap-3">
             <span className="h-[6px] w-12 bg-green-700"></span>
@@ -58,8 +59,7 @@ export default function Home() {
           {[1, 2, 3].map((item) => (
             <div
               key={item}
-              className="relative rounded-xl bg-white p-10 shadow-xl card-cinematic  ">
-              {/* Icon badge */}
+              className="relative rounded-xl bg-white p-10 shadow-xl card-cinematic">
               <div className="absolute -top-4 left-6 h-9 w-9 rounded-full bg-white shadow-md flex items-center justify-center">
                 <div className="h-7 w-7 rounded-full border-4 border-green-700 flex items-center justify-center">
                   <span className="h-2.5 w-2.5 rounded-full bg-green-700 block"></span>
@@ -70,7 +70,7 @@ export default function Home() {
                 <h4 className="text-xl sm:text-base font-bold text-gray-800">
                   Who we are.
                 </h4>
-                <p className="mt-2 text-[11px]  font-bold not-odd:sm:text-[12px] text-gray-600 leading-relaxed">
+                <p className="mt-2 text-[11px] font-bold sm:text-[12px] text-gray-600 leading-relaxed">
                   Anuman River basin of the Western Ghats, our journey began
                   with the revival of Hanumanathi (Anuman Nadhi) — lifeline for
                   farmers across Radhapuram Taluk in Tirunelveli District.
@@ -79,6 +79,17 @@ export default function Home() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Events Section */}
+      <section className="mt-10 ml-3 mr-3">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="h-[6px] w-12 bg-indigo-600"></span>
+          <h3 className="text-xl sm:text-2xl font-bold uppercase text-indigo-600 tracking-wide">
+            Upcoming Events
+          </h3>
+        </div>
+        <UpComingEvents />
       </section>
     </div>
   );
