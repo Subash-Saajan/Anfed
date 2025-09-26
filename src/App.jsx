@@ -9,7 +9,6 @@ import EventForm from "./components/EventForm";
 import AdminBubble from "./components/AdminBubble";
 import About from "./Pages/About";
 import "./App.css";
-import Footer from "./components/Footer.jsx";
 
 export default function App() {
   return (
@@ -39,7 +38,6 @@ export default function App() {
       </main>
 
       <AdminBubble />
-      <Footer />
     </BrowserRouter>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import emailjs from "emailjs-com";
 import logo from "../assets/logo.png";
 import { FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 
@@ -16,7 +15,7 @@ export default function Contact() {
     e.preventDefault();
     setStatus(null);
 
-    if (!name.trim() || !email.trim() || !message.trim() || !mobile.trim()) {
+    if (!name.trim() || !email.trim() || !mobile.trim() || !subject.trim()) {
       setStatus("error");
       return;
     }
@@ -24,28 +23,54 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      await emailjs.send(
-        "your_service_id", // 👉 from EmailJS
-        "your_template_id", // 👉 from EmailJS
-        {
-          from_name: name,
-          from_email: email,
-          from_mobile: mobile, // send mobile number
-          subject: subject,
-          message: message,
-          to_email: "subashsaajan@gmail.com", // your email
-        },
-        "your_public_key" // 👉 from EmailJS
+      const submitFormData = new FormData();
+      submitFormData.append("name", name);
+      submitFormData.append("email", email);
+      submitFormData.append("mobile", mobile);
+      submitFormData.append("message", message);
+      // FormSubmit helpers
+      submitFormData.append("_replyto", email);
+      submitFormData.append(
+        "_subject",
+        subject && subject.trim().length > 0
+          ? subject
+          : `New message from ${name}`
       );
+      submitFormData.append("_template", "table");
+      submitFormData.append("_captcha", "false");
+
+      const response = await fetch(
+        "https://formsubmit.co/ajax/sarveswaranmg@gmail.com",
+        {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: submitFormData,
+        }
+      );
+
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        const text = await response.text();
+        throw new Error(`Form submit failed (${response.status}): ${text}`);
+      }
+
+      if (
+        !response.ok ||
+        !(result && (result.success === "true" || result.success === true))
+      ) {
+        throw new Error(`Form submit failed: ${JSON.stringify(result)}`);
+      }
 
       setName("");
       setEmail("");
-      setMobile(""); // reset mobile
+      setMobile("");
       setSubject("");
       setMessage("");
       setStatus("ok");
     } catch (err) {
-      console.error("Email send error:", err);
+      console.error("Form submit error:", err);
       setStatus("error");
     } finally {
       setLoading(false);
@@ -99,31 +124,31 @@ export default function Contact() {
                 />
               </div>
 
-                <input
+              <input
                 className="w-full p-3 border rounded-md bg-slate-50"
                 placeholder="Mobile Number"
                 type="tel"
+                inputMode="numeric"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
                 required
-                pattern="\d{10}"  // ensures exactly 10 digits
+                pattern="[0-9]{10}"
                 title="Please enter a 10-digit mobile number"
-                />
-
+              />
 
               <input
                 className="w-full p-3 border rounded-md bg-slate-50"
                 placeholder="Subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
+                required
               />
 
               <textarea
                 className="w-full p-3 border rounded-md bg-slate-50 min-h-[140px] resize-none"
-                placeholder="Message"
+                placeholder="Message (optional)"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                required
               />
 
               <div className="flex items-center gap-3">
@@ -137,7 +162,7 @@ export default function Contact() {
 
                 {status === "ok" && (
                   <div className="text-sm text-green-600">
-                    Message sent — thank you.
+                    Thank you! We’ll get back to you within 24 hours.
                   </div>
                 )}
                 {status === "error" && (

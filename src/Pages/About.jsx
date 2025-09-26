@@ -1,5 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
-import Footer from "../components/Footer";
+import React, { useState } from "react";
 
 export default function About() {
   // Simple team data for the carousel
@@ -26,53 +25,20 @@ export default function About() {
 
   const len = teamMembers.length;
   // Infinite carousel state using clones: [last, ...items, first]
-  const [currentIndex, setCurrentIndex] = useState(1); // 1..len
-  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0); // 0..len-1
   const [animating, setAnimating] = useState(false);
-  const currentIndexRef = useRef(currentIndex);
 
-  useEffect(() => {
-    currentIndexRef.current = currentIndex;
-  }, [currentIndex]);
-
-  const slides = [teamMembers[len - 1], ...teamMembers, teamMembers[0]];
-
-  const snapIfNeeded = () => {
-    const idx = currentIndexRef.current;
-    if (idx === 0) {
-      setTransitionEnabled(false);
-      setCurrentIndex(len);
-      requestAnimationFrame(() => setTransitionEnabled(true));
-    } else if (idx === len + 1) {
-      setTransitionEnabled(false);
-      setCurrentIndex(1);
-      requestAnimationFrame(() => setTransitionEnabled(true));
-    }
-  };
-
-  const stepOnce = (dir) => {
-    setCurrentIndex((i) => i + dir);
-    setTimeout(() => {
-      snapIfNeeded();
-    }, 320);
-  };
-
-  const goSteps = (dir, steps) => {
-    if (steps <= 0 || animating) return;
+  const fadeTo = (index) => {
+    if (animating) return;
     setAnimating(true);
-    const run = (n) => {
-      if (n === 0) {
-        setAnimating(false);
-        return;
-      }
-      stepOnce(dir);
-      setTimeout(() => run(n - 1), 320);
-    };
-    run(steps);
+    // wrap around using modulo
+    const target = ((index % len) + len) % len;
+    setCurrentIndex(target);
+    setTimeout(() => setAnimating(false), 320);
   };
 
-  const prevTeam = () => goSteps(-1, 1);
-  const nextTeam = () => goSteps(1, 1);
+  const prevTeam = () => fadeTo(currentIndex - 1);
+  const nextTeam = () => fadeTo(currentIndex + 1);
 
   return (
     <main id="about" className="relative min-h-screen bg-white text-slate-800">
@@ -98,22 +64,22 @@ export default function About() {
         {/* Hero */}
         <section className="relative isolate overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:py-16 md:py-20">
-            <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-slate-900">
+            <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-slate-900 text-left">
               ABOUT US
             </h1>
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 items-center gap-8">
-              <div>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 place-items-center gap-4 sm:gap-6">
+              <div className="text-center">
                 <p className="max-w-xl text-slate-600 leading-relaxed">
                   We’re building sustainable value through innovation,
                   community, and accountability. Learn about our mission,
                   vision, and the people who make it happen.
                 </p>
               </div>
-              <div className="flex md:justify-end">
+              <div className="flex justify-center">
                 <img
                   src="/files%20figma/tamil%20nadu.png"
                   alt="Tamil Nadu map"
-                  className="block mx-auto md:mx-0 w-24 sm:w-32 md:w-40 lg:w-48 h-auto object-contain"
+                  className="block mx-auto w-28 sm:w-40 md:w-56 lg:w-64 h-auto object-contain"
                 />
               </div>
             </div>
@@ -154,7 +120,7 @@ export default function About() {
         {/* Team */}
         <section className="mx-auto max-w-7xl px-4 py-6 sm:py-12">
           {/* Banner */}
-          <div className="relative rounded-xl overflow-hidden mb-6 md:mb-12 lg:mb-24">
+          <div className="relative rounded-xl overflow-hidden mb-1 md:mb-15 lg:mb-20">
             <img
               src="/files%20figma/photorealistic-view-african-people-harvesting-vegetables-grains%20(1).jpg"
               alt="Our Team"
@@ -165,8 +131,9 @@ export default function About() {
               style={{
                 background:
                   "linear-gradient(90deg, rgba(68,136,0,0.7) 0%, rgba(68,136,0,0) 100%)",
-              }}>
-              <h2 className="text-white text-xl md:text-2xl font-bold">
+              }}
+            >
+              <h2 className="text-white text-xl md:text-2xl font-bold ">
                 Our Team
               </h2>
             </div>
@@ -174,50 +141,46 @@ export default function About() {
 
           {/* Team Member Carousel */}
           <div className="relative">
-            {/* Slider viewport */}
-            <div className="w-full overflow-x-hidden overflow-y-visible">
-              <div
-                className="flex overflow-visible"
-                style={{
-                  transform: `translateX(-${currentIndex * 100}%)`,
-                  transition: transitionEnabled
-                    ? "transform 300ms ease-out"
-                    : "none",
-                }}>
-                {slides.map((m, idx) => (
+            {/* Crossfade viewport */}
+            <div className="relative w-full overflow-visible md:h-[22rem] lg:h-[20rem]">
+              {teamMembers.map((m, idx) => (
+                <div
+                  key={idx}
+                  className={`absolute inset-0 px-0 transition-opacity duration-300 ease-out ${
+                    idx === currentIndex
+                      ? "opacity-100"
+                      : "opacity-0 pointer-events-none"
+                  }`}
+                >
                   <div
-                    key={idx}
-                    className="relative z-10 w-full shrink-0 px-0 overflow-visible">
-                    <div
-                      className="relative overflow-visible rounded-2xl border border-slate-200 p-4 md:p-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-5 items-center pr-24 md:pr-32 lg:pr-40 md:min-h-64 lg:min-h-72"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, rgba(68,136,0,1) 0%, rgba(68,136,0,0.2) 100%), #ffffff",
-                      }}>
-                      {/* Text Section */}
-                      <div className="md:col-span-2 text-slate-800">
-                        <h3 className="text-2xl font-bold mb-1 text-slate-900">
-                          {m.name}
-                        </h3>
-                        <p className="text-sm font-medium mb-3 text-[#ffffff]">
-                          {m.role}
-                        </p>
-                        <p className="text-sm leading-relaxed text-slate-600">
-                          {m.desc}
-                        </p>
-                      </div>
-
-                      {/* Image Section */}
+                    className="relative h-full overflow-visible rounded-2xl border border-slate-200 p-4 md:p-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-5 items-center pr-24 md:pr-32 lg:pr-40"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, rgba(68,136,0,1) 0%, rgba(68,136,0,0.2) 100%), #ffffff",
+                    }}
+                  >
+                    {/* Text Section */}
+                    <div className="md:col-span-2 text-slate-800">
+                      <h3 className="text-2xl font-bold mb-1 text-slate-900">
+                        {m.name}
+                      </h3>
+                      <p className="text-sm font-medium mb-3 text-[#ffffff]">
+                        {m.role}
+                      </p>
+                      <p className="text-sm leading-relaxed text-slate-600">
+                        {m.desc}
+                      </p>
                     </div>
-                    {/* Large overlapping image for md+ placed OUTSIDE the card */}
-                    <img
-                      src={m.img}
-                      alt={m.name}
-                      className="hidden md:block absolute right-6 md:right-8 lg:right-12 bottom-0 z-50 w-56 md:w-64 lg:w-72 md:h-[22rem] lg:h-[26rem] object-cover rounded-xl drop-shadow-lg"
-                    />
+                    {/* Image Section (mobile only) */}
                   </div>
-                ))}
-              </div>
+                  {/* Large overlapping image for md+ placed OUTSIDE the card, sibling to card */}
+                  <img
+                    src={m.img}
+                    alt={m.name}
+                    className="hidden md:block absolute right-6 md:right-8 lg:right-12 bottom-0 z-50 w-56 md:w-64 lg:w-72 md:h-[22rem] lg:h-[26rem] object-cover rounded-xl drop-shadow-lg"
+                  />
+                </div>
+              ))}
             </div>
 
             {/* Controls */}
@@ -226,7 +189,8 @@ export default function About() {
               onClick={prevTeam}
               aria-label="Previous team member"
               disabled={animating}
-              className="absolute -left-3 md:-left-6 lg:-left-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed">
+              className="absolute -left-10 md:-left-14 lg:-left-16 top-1/2 -translate-y-1/2 z-60 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               ‹
             </button>
             <button
@@ -234,7 +198,8 @@ export default function About() {
               onClick={nextTeam}
               aria-label="Next team member"
               disabled={animating}
-              className="absolute -right-3 md:-right-6 lg:-right-8 top-1/2 -translate-y-1/2 z-30 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed">
+              className="absolute -right-10 md:-right-14 lg:-right-16 top-1/2 -translate-y-1/2 z-60 inline-flex items-center justify-center rounded-full bg-[#448800] text-white w-9 h-9 shadow-md hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               ›
             </button>
 
@@ -244,22 +209,9 @@ export default function About() {
                 <button
                   key={i}
                   aria-label={`Go to slide ${i + 1}`}
-                  onClick={() => {
-                    if (animating) return;
-                    const realIndex =
-                      (((currentIndexRef.current - 1) % len) + len) % len;
-                    let delta = i - realIndex; // desired movement
-                    // choose shortest path around the loop
-                    if (delta > 0 && delta > len / 2) delta = delta - len;
-                    if (delta < 0 && -delta > len / 2) delta = delta + len;
-                    const steps = Math.abs(delta);
-                    const dir = delta > 0 ? 1 : -1;
-                    goSteps(dir, steps);
-                  }}
+                  onClick={() => fadeTo(i)}
                   className={`h-2 rounded-full transition-all ${
-                    i === (currentIndex - 1 + len) % len
-                      ? "bg-[#448800] w-6"
-                      : "bg-slate-300 w-2"
+                    i === currentIndex ? "bg-[#448800] w-6" : "bg-slate-300 w-2"
                   }`}
                 />
               ))}
