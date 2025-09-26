@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import EventForm from "./components/EventForm";
 import AdminBubble from "./components/AdminBubble";
 import About from "./Pages/About";
+import Footer from "./components/Footer";
 import "./App.css";
 
 export default function App() {
@@ -36,7 +37,7 @@ export default function App() {
           />
         </Routes>
       </main>
-
+      <Footer />
       <AdminBubble />
     </BrowserRouter>
   );
