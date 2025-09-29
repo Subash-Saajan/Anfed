@@ -1,4 +1,4 @@
-import bgImage from "../assets/banner.jpg"; 
+import bgImage from "../assets/Banner.jpg"; 
 import UpComingEvents from "../components/upComingEvents";
 import Footer from "../components/Footer.jsx";
 
