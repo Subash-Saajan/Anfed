@@ -10,18 +10,14 @@ export default function Contact() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null); // null | "ok" | "error"
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus(null);
-
     if (!name.trim() || !email.trim() || !mobile.trim() || !subject.trim()) {
       setStatus("error");
       return;
     }
-
     setLoading(true);
-
     try {
       const submitFormData = new FormData();
       submitFormData.append("name", name);
@@ -38,7 +34,6 @@ export default function Contact() {
       );
       submitFormData.append("_template", "table");
       submitFormData.append("_captcha", "false");
-
       const response = await fetch(
         "https://formsubmit.co/ajax/sarveswaranmg@gmail.com",
         {
@@ -47,7 +42,6 @@ export default function Contact() {
           body: submitFormData,
         }
       );
-
       let result;
       try {
         result = await response.json();
@@ -55,14 +49,12 @@ export default function Contact() {
         const text = await response.text();
         throw new Error(`Form submit failed (${response.status}): ${text}`);
       }
-
       if (
         !response.ok ||
         !(result && (result.success === "true" || result.success === true))
       ) {
         throw new Error(`Form submit failed: ${JSON.stringify(result)}`);
       }
-
       setName("");
       setEmail("");
       setMobile("");
@@ -76,7 +68,6 @@ export default function Contact() {
       setLoading(false);
     }
   };
-
   return (
     <div className="container mx-auto px-12 py-12">
       {/* Contact Info */}
@@ -98,7 +89,6 @@ export default function Contact() {
           <img src={logo} alt="logo" className="w-44 md:w-72 object-contain" />
         </div>
       </div>
-
       {/* Form */}
       <div className="bg-slate-100 p-6 rounded-2xl">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
@@ -123,7 +113,6 @@ export default function Contact() {
                   required
                 />
               </div>
-
               <input
                 className="w-full p-3 border rounded-md bg-slate-50"
                 placeholder="Mobile Number"
@@ -135,7 +124,6 @@ export default function Contact() {
                 pattern="[0-9]{10}"
                 title="Please enter a 10-digit mobile number"
               />
-
               <input
                 className="w-full p-3 border rounded-md bg-slate-50"
                 placeholder="Subject"
@@ -143,14 +131,12 @@ export default function Contact() {
                 onChange={(e) => setSubject(e.target.value)}
                 required
               />
-
               <textarea
                 className="w-full p-3 border rounded-md bg-slate-50 min-h-[140px] resize-none"
                 placeholder="Message (optional)"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-
               <div className="flex items-center gap-3">
                 <button
                   type="submit"
@@ -159,7 +145,6 @@ export default function Contact() {
                 >
                   {loading ? "Sending..." : "Submit"}
                 </button>
-
                 {status === "ok" && (
                   <div className="text-sm text-green-600">
                     Thank you! We’ll get back to you within 24 hours.
@@ -173,7 +158,6 @@ export default function Contact() {
               </div>
             </form>
           </div>
-
           {/* Right: Google Map */}
           <div className="p-3">
             <div className="w-full h-full rounded-lg overflow-hidden border">
