@@ -9,6 +9,7 @@ import EventForm from "./components/EventForm";
 import AdminBubble from "./components/AdminBubble";
 import About from "./Pages/About";
 import Footer from "./components/Footer";
+import Farmers from "./Pages/Farmers";
 import "./App.css";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/events" element={<Events />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/farmers" element={<Farmers></Farmers>}></Route>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
