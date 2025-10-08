@@ -494,7 +494,7 @@ export default function Farmers() {
                   url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
                       <circle cx="20" cy="20" r="18" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
-                      <text x="20" y="26" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">${count}</text>
+                      <text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter" font-size="12" font-weight="bold">${count}</text>
                     </svg>
                   `)}`,
                   scaledSize: new window.google.maps.Size(40, 40),

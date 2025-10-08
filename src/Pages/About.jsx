@@ -109,28 +109,49 @@ export default function About() {
       {/* Hero */}
 {/* About Us Hero Section */}
 <section className="relative isolate overflow-hidden about-hero py-20">
-  <div className="mx-auto max-w-7xl px-4 md:px-10 grid md:grid-cols-2 gap-8 items-center">
+  <div className="mx-auto max-w-7xl px-4 md:px-10 grid md:grid-cols-[6fr_3fr] gap-8 items-center">
     {/* Left side text */}
-    <div className="text-left">
+    <div className="text-left md:pr-12">
       <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
         ABOUT US
       </h1>
       <p className="text-slate-600 leading-relaxed text-base md:text-lg">
-        We’re building sustainable value through innovation, community, and accountability.
-        Learn about our mission, vision, and the people who make it happen.
+        Rooted in the Anuman River basin of the Western Ghats, our journey began
+        with the revival of Hanumannathi (Anuman River)—a lifeline for farmers
+        across Radhapuram Taluk in Tirunelveli District. Once weakened by
+        decades of neglect, the river was restored in 2020 through a remarkable
+        collaboration between the District Administration, Anna University, Nam
+        Anuman Nathi Society, and hundreds of local volunteers. To carry this
+        legacy forward, the Anuman Nathi Society was formally registered as a
+        custodian of traditional river basin wisdom. Its mission is to secure
+        water resources, drive agriculture-based economic growth, and contribute
+        to the state’s trillion-dollar economy vision. By engaging communities
+        in water governance and working with research institutions, academics,
+        and technical experts, the Society anchors sustainability at its core.
+        As a natural extension, the Anuman Nathi FED Farmer Producer Company Ltd
+        (ANFED FPO) was formed under the Union Government’s 10,000 FPO Scheme,
+        supported by NAFED and mentored by Viruthai Millets CBBO. Today, ANFED
+        FPO is more than a farmer collective—it is a movement to make
+        agriculture dignified, sustainable, and economically viable. Through
+        ANFED MART, we promote natural farming, enable value addition, and
+        connect farmers directly with consumers, while safeguarding the
+        ecological balance of our river basin.
       </p>
     </div>
 
     {/* Right side image */}
-    <div className="flex justify-end">
+    <div className="flex justify-center items-center">
       <img
         src="/files%20figma/tamil%20nadu.png"
         alt="Tamil Nadu map"
-        className="w-28 sm:w-40 md:w-56 lg:w-64 h-auto object-contain"
+        className="w-32 sm:w-44 md:w-60 lg:w-72 h-auto object-contain"
       />
     </div>
   </div>
 </section>
+
+
+
 
 
       {/* Mission & Vision */}
@@ -139,14 +160,13 @@ export default function About() {
           <h2 className="text-xl font-semibold text-slate-900">Our Mission</h2>
           <div className="mt-2 h-1 w-14 rounded-full bg-[#448800]" />
           <p className="mt-3 text-slate-600">
-            To empower communities and stakeholders by delivering reliable, sustainable solutions that drive measurable impact and long-term growth.
-          </p>
+          Our mission is to enhance farmers’ income through collective marketing and value addition, while promoting natural, chemical-free farming rooted in traditional wisdom. We aim to build direct market linkages that eliminate middlemen, and ensure every product reflects transparency, traceability, and trust          </p>
         </article>
         <article ref={addMissionRef} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-slate-900">Our Vision</h2>
           <div className="mt-2 h-1 w-14 rounded-full bg-[#448800]" />
           <p className="mt-3 text-slate-600">
-            A future where innovation and inclusion unlock opportunities for everyone—creating resilient ecosystems that thrive.
+          To build a self-reliant, sustainable rural economy in the Anuman Nathi sub-basin by promoting natural farming, local enterprise, and direct market linkages—ensuring that agriculture becomes a dignified and economically viable livelihood.
           </p>
         </article>
       </section>
