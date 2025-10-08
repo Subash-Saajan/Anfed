@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import bgImage from "../assets/Banner.jpg";
+import bgImage from "../assets/Banner4.png";
 import UpComingEvents from "../components/upComingEvents";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -19,13 +19,29 @@ export default function Home() {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 1.2 } });
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out", duration: 1.2 },
+      });
 
       // Hero image initial animation
-      tl.from(heroImageRef.current, { scale: 1.2, opacity: 0, duration: 1.5, ease: "power4.out" })
-        .from(".hero-hover .text-2xl", { y: 30, opacity: 0, duration: 0.8 }, "-=1.2")
+      tl.from(heroImageRef.current, {
+        scale: 1.2,
+        opacity: 0,
+        duration: 1.5,
+        ease: "power4.out",
+      })
+        .from(
+          ".hero-hover .text-2xl",
+          { y: 30, opacity: 0, duration: 0.8 },
+          "-=1.2"
+        )
         .from(".hero-hover h2", { y: 50, opacity: 0, duration: 1.1 }, "-=1")
-        .from(buttonRef.current, { opacity: 0, y: 20, duration: 0.8, ease: "back.out(1.7)" });
+        .from(buttonRef.current, {
+          opacity: 0,
+          y: 20,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+        });
 
       // Cards scroll animation
       cardsRef.current.forEach((card, i) => {
@@ -64,10 +80,18 @@ export default function Home() {
     if (heroImageRef.current) {
       gsap.set(heroImageRef.current, { transformOrigin: "center center" });
       heroImageRef.current.addEventListener("mouseenter", () =>
-        gsap.to(heroImageRef.current, { scale: 1.1, duration: 0.8, ease: "power3.out" })
+        gsap.to(heroImageRef.current, {
+          scale: 1.1,
+          duration: 0.8,
+          ease: "power3.out",
+        })
       );
       heroImageRef.current.addEventListener("mouseleave", () =>
-        gsap.to(heroImageRef.current, { scale: 1, duration: 0.8, ease: "power3.out" })
+        gsap.to(heroImageRef.current, {
+          scale: 1,
+          duration: 0.8,
+          ease: "power3.out",
+        })
       );
     }
 
@@ -75,10 +99,18 @@ export default function Home() {
     if (buttonRef.current) {
       gsap.set(buttonRef.current, { transformOrigin: "center center" });
       buttonRef.current.addEventListener("mouseenter", () =>
-        gsap.to(buttonRef.current, { scale: 1.05, duration: 0.3, ease: "power3.out" })
+        gsap.to(buttonRef.current, {
+          scale: 1.05,
+          duration: 0.3,
+          ease: "power3.out",
+        })
       );
       buttonRef.current.addEventListener("mouseleave", () =>
-        gsap.to(buttonRef.current, { scale: 1, duration: 0.3, ease: "power3.out" })
+        gsap.to(buttonRef.current, {
+          scale: 1,
+          duration: 0.3,
+          ease: "power3.out",
+        })
       );
     }
 
@@ -105,10 +137,7 @@ export default function Home() {
           className="w-full h-full object-cover"
         />
         {/* Overlay */}
-        <div
-          className="absolute inset-0 bg-gradient-to-r from-[#000000aa] via-[#01010150] to-[#FFFFFF00]"
-          style={{ pointerEvents: "none" }}
-        />
+        <div className="absolute inset-0" style={{ pointerEvents: "none" }} />
 
         {/* Hero text */}
         <div className="absolute top-5 left-10 text-white z-10">
@@ -125,8 +154,7 @@ export default function Home() {
         <div className="absolute bottom-6 left-10 z-20">
           <button
             ref={buttonRef}
-            className="bg-white text-black text-md font-bold py-2 px-6 rounded-full"
-          >
+            className="bg-white text-black text-md font-bold py-2 px-6 rounded-full">
             About us
           </button>
         </div>
@@ -161,8 +189,7 @@ export default function Home() {
             <div
               key={item}
               ref={addToRefs}
-              className="relative rounded-xl bg-white p-10 shadow-xl"
-            >
+              className="relative rounded-xl bg-white p-10 shadow-xl">
               <div className="absolute -top-4 left-6 h-9 w-9 rounded-full bg-white shadow-md flex items-center justify-center">
                 <div className="h-7 w-7 rounded-full border-4 border-green-700 flex items-center justify-center">
                   <span className="h-2.5 w-2.5 rounded-full bg-green-700 block"></span>
