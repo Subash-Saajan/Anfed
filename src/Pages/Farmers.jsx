@@ -14,8 +14,6 @@ export default function Farmers() {
   const [viewportBounds, setViewportBounds] = useState(null);
   // Viewport filtering default ON; user can toggle off
   const [showViewportOnly, setShowViewportOnly] = useState(true);
-  // Mobile: toggle between list and map views
-  const [mobileView, setMobileView] = useState("list"); // 'list' | 'map'
   // (Progress state removed – all data static.)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // used only for static map fallback (optional)
 
@@ -193,9 +191,6 @@ export default function Farmers() {
           mapTypeId: window.google.maps.MapTypeId.ROADMAP,
         });
 
-        // expose globally for resize/visibility adjustments in mobile view
-        window._farmersMap = mapInstance;
-
         // Ensure a single detail InfoWindow exists for the session
         if (!window._farmerDetailInfoWindow) {
           window._farmerDetailInfoWindow = new window.google.maps.InfoWindow();
@@ -293,31 +288,6 @@ export default function Farmers() {
     };
   }, [apiKey, scrollToFarmer]);
 
-  // When switching to map view on mobile, force a resize so Google Maps recalculates layout
-  useEffect(() => {
-    if (
-      mobileView === "map" &&
-      window._farmersMap &&
-      window.google &&
-      window.google.maps
-    ) {
-      const map = window._farmersMap;
-      const currentCenter = map.getCenter();
-      // Defer to next tick to ensure CSS has applied new sizes
-      setTimeout(() => {
-        window.google.maps.event.trigger(map, "resize");
-        if (currentCenter) map.setCenter(currentCenter);
-        // Update bounds-driven filtering
-        try {
-          const b = map.getBounds();
-          if (b) setViewportBounds(b);
-        } catch {
-          /* ignore resize/bounds errors during initial paint */
-        }
-      }, 0);
-    }
-  }, [mobileView]);
-
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 farmers-page">
       <div className="mb-6">
@@ -326,40 +296,10 @@ export default function Farmers() {
         </h1>
       </div>
 
-      {/* Layout: desktop split, mobile toggled sections (Airbnb-like) */}
-      {/* Mobile view toggle */}
-      <div className="md:hidden mb-3 flex w-full items-center justify-center gap-2">
-        <div className="inline-flex rounded-lg border border-slate-200 p-1 bg-white shadow-sm">
-          <button
-            onClick={() => setMobileView("list")}
-            className={`px-3 py-1.5 text-sm rounded-md ${
-              mobileView === "list"
-                ? "bg-slate-900 text-white"
-                : "text-slate-700 hover:bg-slate-100"
-            }`}
-          >
-            List
-          </button>
-          <button
-            onClick={() => setMobileView("map")}
-            className={`px-3 py-1.5 text-sm rounded-md ${
-              mobileView === "map"
-                ? "bg-slate-900 text-white"
-                : "text-slate-700 hover:bg-slate-100"
-            }`}
-          >
-            Map
-          </button>
-        </div>
-      </div>
-
-      <div className="md:flex md:gap-6 md:h-[75vh] flex-col gap-3">
+      {/* Split Layout Container */}
+      <div className="flex gap-6 h-[75vh]">
         {/* Left Half - Search and Farmer Cards */}
-        <div
-          className={`flex flex-col w-full md:w-1/2 ${
-            mobileView === "list" ? "h-[65vh]" : "h-0 overflow-hidden"
-          } md:h-auto`}
-        >
+        <div className="w-1/2 flex flex-col">
           {/* Search Bar */}
           <div className="mb-4">
             <div className="relative">
@@ -494,11 +434,7 @@ export default function Farmers() {
         </div>
 
         {/* Right Half - Map */}
-        <div
-          className={`w-full md:w-1/2 ${
-            mobileView === "map" ? "h-[65vh]" : "h-0 overflow-hidden"
-          } md:h-auto`}
-        >
+        <div className="w-1/2">
           <div
             ref={mapRef}
             className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
