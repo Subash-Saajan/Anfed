@@ -421,7 +421,7 @@ const LOCALITY_COORDS = [
   [/lebbaikudieruppu|leppaikudieruppu/i, 8.37, 77.63],
   [/sivasubramaniapuram|sivasubramaniyapuram/i, 8.41, 77.62],
   [/perungudi|perugudi/i, 8.39, 77.62],
-  [/dhanakkarkulam|dhanakkarkulam/i, 8.40, 77.63],
+  [/dhanakkarkulam|dhanakkarkulam/i, 8.4, 77.63],
   [/koliyankulam/i, 8.42, 77.61],
   [/valliyoor|vallioor/i, 8.381, 77.611],
   [/palavoor/i, 8.257, 77.743],
@@ -438,15 +438,25 @@ function parseCSV(csv) {
     const line = lines[i];
     if (!line) continue;
     const fields = [];
-    let cur = ""; let inQ = false;
+    let cur = "";
+    let inQ = false;
     for (let j = 0; j < line.length; j++) {
       const ch = line[j];
-      if (ch === '"') { inQ = !inQ; continue; }
-      if (ch === ',' && !inQ) { fields.push(cur.trim()); cur = ""; } else cur += ch;
+      if (ch === '"') {
+        inQ = !inQ;
+        continue;
+      }
+      if (ch === "," && !inQ) {
+        fields.push(cur.trim());
+        cur = "";
+      } else cur += ch;
     }
     fields.push(cur.trim());
     if (fields.length >= 2) {
-      out.push({ name: fields[0].replace(/^"|"$/g, ''), address: fields[1].replace(/^"|"$/g, '') });
+      out.push({
+        name: fields[0].replace(/^"|"$/g, ""),
+        address: fields[1].replace(/^"|"$/g, ""),
+      });
     }
   }
   return out;
@@ -463,7 +473,8 @@ function pickCoords(address) {
 // Deterministic jitter from string (small spread to avoid stacking exact duplicates)
 function jitterFromName(name) {
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < name.length; i++)
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
   const delta = ((hash % 1000) / 1000 - 0.5) * 0.02; // ±0.01 deg
   const delta2 = (((hash / 1000) % 1000) / 1000 - 0.5) * 0.02;
   return [delta, delta2];
@@ -471,7 +482,7 @@ function jitterFromName(name) {
 
 const RAW_FARMERS = parseCSV(RAW_CSV);
 
-export const FARMERS = RAW_FARMERS.map(f => {
+export const FARMERS = RAW_FARMERS.map((f) => {
   const [lat, lng] = pickCoords(f.address);
   const [dLat, dLng] = jitterFromName(f.name + f.address);
   return {

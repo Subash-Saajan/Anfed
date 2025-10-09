@@ -1,44 +1,71 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FARMERS } from "../data/farmersData";
-
-// (Removed caching & geocoding – static heuristic coordinates now.)
-
-// Rate limiting utility
-class RateLimiter {
-  constructor(maxRequests = 5, timeWindow = 1000) {
-    this.maxRequests = maxRequests;
-    this.timeWindow = timeWindow;
-    this.requests = [];
-  }
-
-  async throttle() {
-    const now = Date.now();
-    this.requests = this.requests.filter(
-      (time) => now - time < this.timeWindow
-    );
-
-    if (this.requests.length >= this.maxRequests) {
-      const oldestRequest = Math.min(...this.requests);
-      const delay = this.timeWindow - (now - oldestRequest) + 50;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      return this.throttle();
-    }
-
-    this.requests.push(now);
-  }
-}
+// Always-on viewport filtering version.
 
 export default function Farmers() {
   const mapRef = useRef(null);
-  const [error, setError] = useState("");
+  const listRef = useRef(null); // scroll container for farmer cards
+  // (Removed error state – assuming scripts preload correctly.)
   const [farmerData] = useState(FARMERS);
   const [farmersWithCoords, setFarmersWithCoords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFarmer, setSelectedFarmer] = useState(null);
+  const [hoveredFarmer, setHoveredFarmer] = useState(null); // for marker hover highlighting
   const [viewportBounds, setViewportBounds] = useState(null);
-  const [showViewportOnly, setShowViewportOnly] = useState(false);
+  // Viewport filtering default ON; user can toggle off
+  const [showViewportOnly, setShowViewportOnly] = useState(true);
+  // Mobile: toggle between list and map views
+  const [mobileView, setMobileView] = useState("list"); // 'list' | 'map'
   // (Progress state removed – all data static.)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // used only for static map fallback (optional)
+
+  // Helper to create stable slug for DOM data attributes
+  const slugify = useCallback(
+    (str) =>
+      str
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, ""),
+    []
+  );
+
+  const scrollToFarmer = useCallback(
+    (farmer) => {
+      if (!farmer) return;
+      const slug = slugify(farmer.name);
+      const el = document.querySelector(`[data-farmer-id="${slug}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-blue-400");
+        setTimeout(() => el.classList.remove("ring-2", "ring-blue-400"), 1200);
+      }
+    },
+    [slugify]
+  );
+
+  // Scroll a card into view only if outside the visible portion of the list container
+  const ensureVisible = useCallback(
+    (farmerName, { flash = false } = {}) => {
+      if (!farmerName || !listRef.current) return;
+      const slug = slugify(farmerName);
+      const container = listRef.current;
+      const el = container.querySelector(`[data-farmer-id="${slug}"]`);
+      if (!el) return;
+      const cRect = container.getBoundingClientRect();
+      const eRect = el.getBoundingClientRect();
+      const above = eRect.top < cRect.top + 20; // small padding
+      const below = eRect.bottom > cRect.bottom - 20;
+      if (above || below) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      if (flash) {
+        el.classList.add("ring-2", "ring-blue-400");
+        setTimeout(() => el.classList.remove("ring-2", "ring-blue-400"), 1000);
+      }
+    },
+    [slugify]
+  );
 
   // Filter farmers based on search term and viewport
   const getFilteredFarmers = () => {
@@ -85,19 +112,60 @@ export default function Farmers() {
     // The getFilteredFarmers function will be called again with new bounds
   }, [viewportBounds, showViewportOnly, farmersWithCoords, searchTerm]);
 
+  // When selected farmer changes, always bring fully into view
+  useEffect(() => {
+    if (selectedFarmer) ensureVisible(selectedFarmer.name, { flash: true });
+  }, [selectedFarmer, ensureVisible]);
+
+  // When hovered farmer changes, gently ensure visibility without flashing
+  useEffect(() => {
+    if (hoveredFarmer) ensureVisible(hoveredFarmer, { flash: false });
+  }, [hoveredFarmer, ensureVisible]);
+
   useEffect(() => {
     let mapInstance = null;
     let markers = [];
     let clustererInstance = null;
 
-    // Function to center map on selected farmer
+    // Function to center map on selected farmer and show details above the marker
     window.centerOnFarmer = (farmerName) => {
-      const marker = markers.find((m) => m.farmerData?.name === farmerName);
+      const allMarkers = window._farmerMarkers || [];
+      const marker = allMarkers.find((m) => m.farmerData?.name === farmerName);
       if (marker && mapInstance) {
         mapInstance.setCenter(marker.getPosition());
-        mapInstance.setZoom(15);
-        // Trigger click to show info window
-        window.google.maps.event.trigger(marker, "click");
+        if (mapInstance.getZoom() < 15) mapInstance.setZoom(15);
+        // Close any hover tooltips to avoid overlap
+        allMarkers.forEach(
+          (m) => m._hoverInfoWindow && m._hoverInfoWindow.close()
+        );
+        // Create the singleton detail InfoWindow if needed
+        if (
+          !window._farmerDetailInfoWindow &&
+          window.google &&
+          window.google.maps
+        ) {
+          window._farmerDetailInfoWindow = new window.google.maps.InfoWindow();
+        }
+        const detail = window._farmerDetailInfoWindow;
+        if (detail) {
+          const f = marker.farmerData || {};
+          const content = `
+            <div style="max-width:260px;padding:8px 10px;line-height:1.35">
+              <div style="font-weight:600;color:#0f172a;margin-bottom:4px">${
+                f.name || "Farmer"
+              }</div>
+              <div style="font-size:12px;color:#475569">${(f.address || "")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")}</div>
+              ${
+                f.approximate
+                  ? '<div style="margin-top:6px;font-size:11px;color:#64748b">Location approx.</div>'
+                  : ""
+              }
+            </div>`;
+          detail.setContent(content);
+          detail.open(mapInstance, marker);
+        }
       }
     };
 
@@ -117,12 +185,7 @@ export default function Farmers() {
 
     async function initMap() {
       try {
-        if (!window.google || !window.google.maps) {
-          setError(
-            "Google Maps SDK not loaded. Ensure script tag is present in index.html."
-          );
-          return;
-        }
+        if (!window.google || !window.google.maps) return; // silently fail
 
         mapInstance = new window.google.maps.Map(mapRef.current, {
           center: { lat: 11.1271, lng: 78.6569 },
@@ -130,22 +193,26 @@ export default function Farmers() {
           mapTypeId: window.google.maps.MapTypeId.ROADMAP,
         });
 
+        // expose globally for resize/visibility adjustments in mobile view
+        window._farmersMap = mapInstance;
+
+        // Ensure a single detail InfoWindow exists for the session
+        if (!window._farmerDetailInfoWindow) {
+          window._farmerDetailInfoWindow = new window.google.maps.InfoWindow();
+        }
+
         mapInstance.addListener("bounds_changed", () => {
           clearTimeout(window.boundsUpdateTimeout);
           window.boundsUpdateTimeout = setTimeout(updateViewportBounds, 250);
         });
 
         mapInstance.addListener("zoom_changed", () => {
-          const zoom = mapInstance.getZoom();
-          if (zoom >= 12) setShowViewportOnly(true);
-          else if (zoom < 10) setShowViewportOnly(false);
           updateViewportBounds();
         });
 
         buildOrReuseMarkers(mapInstance);
       } catch (err) {
         console.error("Map init error", err);
-        setError("Failed to initialize map");
       }
     }
 
@@ -160,18 +227,23 @@ export default function Farmers() {
               position: { lat: f.lat, lng: f.lng },
               title: f.name,
             });
-            const infoWindow = new window.google.maps.InfoWindow({
-              content: `<div style="max-width:300px;">
-              <h3 style="margin:0 0 8px;font-weight:600;">${f.name}</h3>
-              <p style="margin:0;font-size:14px;color:#666;">${f.address}</p>
-              ${
-                f.approximate
-                  ? '<p style="margin:4px 0 0;font-size:11px;color:#999;">Approximate</p>'
-                  : ""
-              }
-            </div>`,
+            const hoverInfoWindow = new window.google.maps.InfoWindow({
+              content: `<div style="padding:4px 8px;font-size:12px;font-weight:500;">${f.name}</div>`,
             });
-            marker.addListener("click", () => infoWindow.open(map, marker));
+            marker._hoverInfoWindow = hoverInfoWindow;
+            marker.addListener("click", () => {
+              setSelectedFarmer(f);
+              // Do not open map details on marker click; just sync list per earlier requirement
+              scrollToFarmer(f);
+            });
+            marker.addListener("mouseover", () => {
+              hoverInfoWindow.open(map, marker);
+              setHoveredFarmer(f.name);
+            });
+            marker.addListener("mouseout", () => {
+              hoverInfoWindow.close();
+              setHoveredFarmer((prev) => (prev === f.name ? null : prev));
+            });
             marker.farmerData = f;
             return marker;
           }
@@ -219,30 +291,75 @@ export default function Farmers() {
         mapInstance = null;
       }
     };
-  }, [apiKey]);
+  }, [apiKey, scrollToFarmer]);
+
+  // When switching to map view on mobile, force a resize so Google Maps recalculates layout
+  useEffect(() => {
+    if (
+      mobileView === "map" &&
+      window._farmersMap &&
+      window.google &&
+      window.google.maps
+    ) {
+      const map = window._farmersMap;
+      const currentCenter = map.getCenter();
+      // Defer to next tick to ensure CSS has applied new sizes
+      setTimeout(() => {
+        window.google.maps.event.trigger(map, "resize");
+        if (currentCenter) map.setCenter(currentCenter);
+        // Update bounds-driven filtering
+        try {
+          const b = map.getBounds();
+          if (b) setViewportBounds(b);
+        } catch {
+          /* ignore resize/bounds errors during initial paint */
+        }
+      }, 0);
+    }
+  }, [mobileView]);
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 farmers-page">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
           Farmers Directory
         </h1>
-        <p className="text-slate-600 mt-1">
-          {error
-            ? error
-            : `${farmerData.length} farmers loaded instantly (approximate map positions).`}
-        </p>
-        {!error && (
-          <div className="mt-2 flex gap-4 text-sm text-slate-500">
-            <span>🚀 Static data (no geocode API calls)</span>
-          </div>
-        )}
       </div>
 
-      {/* Split Layout Container */}
-      <div className="flex gap-6 h-[75vh]">
+      {/* Layout: desktop split, mobile toggled sections (Airbnb-like) */}
+      {/* Mobile view toggle */}
+      <div className="md:hidden mb-3 flex w-full items-center justify-center gap-2">
+        <div className="inline-flex rounded-lg border border-slate-200 p-1 bg-white shadow-sm">
+          <button
+            onClick={() => setMobileView("list")}
+            className={`px-3 py-1.5 text-sm rounded-md ${
+              mobileView === "list"
+                ? "bg-slate-900 text-white"
+                : "text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            List
+          </button>
+          <button
+            onClick={() => setMobileView("map")}
+            className={`px-3 py-1.5 text-sm rounded-md ${
+              mobileView === "map"
+                ? "bg-slate-900 text-white"
+                : "text-slate-700 hover:bg-slate-100"
+            }`}
+          >
+            Map
+          </button>
+        </div>
+      </div>
+
+      <div className="md:flex md:gap-6 md:h-[75vh] flex-col gap-3">
         {/* Left Half - Search and Farmer Cards */}
-        <div className="w-1/2 flex flex-col">
+        <div
+          className={`flex flex-col w-full md:w-1/2 ${
+            mobileView === "list" ? "h-[65vh]" : "h-0 overflow-hidden"
+          } md:h-auto`}
+        >
           {/* Search Bar */}
           <div className="mb-4">
             <div className="relative">
@@ -269,16 +386,11 @@ export default function Farmers() {
             </div>
             <div className="flex justify-between items-center mt-1">
               <p className="text-sm text-slate-500">
-                {filteredFarmers.length} of{" "}
-                {farmersWithCoords.length > 0
-                  ? farmersWithCoords.length
-                  : farmerData.length}{" "}
-                farmers
-                {showViewportOnly &&
-                  viewportBounds &&
-                  " (visible in current view)"}
+                {filteredFarmers.length}{" "}
+                {showViewportOnly ? "visible in view" : "matching"} of{" "}
+                {farmerData.length} farmers
               </p>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 text-xs select-none cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showViewportOnly}
@@ -286,36 +398,49 @@ export default function Farmers() {
                   className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span
-                  className={`${
+                  className={
                     showViewportOnly
                       ? "text-blue-600 font-medium"
                       : "text-slate-600"
-                  }`}
+                  }
                 >
-                  Show visible only {showViewportOnly && "✓"}
+                  Viewport filter {showViewportOnly ? "ON" : "OFF"}
                 </span>
               </label>
             </div>
           </div>
 
           {/* Farmer Cards Container */}
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+          <div ref={listRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
             {filteredFarmers.length > 0 ? (
               filteredFarmers.map((farmer, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer hover:shadow-md ${
-                    selectedFarmer?.name === farmer.name
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-slate-200 bg-white hover:border-slate-300"
-                  }`}
+                  data-farmer-id={slugify(farmer.name)}
+                  className={`group rounded-xl border transition-all cursor-pointer 
+                    p-3 md:p-4 bg-white hover:bg-slate-50 
+                    ${
+                      selectedFarmer?.name === farmer.name
+                        ? "border-blue-500 ring-2 ring-blue-500/40 shadow-sm"
+                        : hoveredFarmer === farmer.name
+                        ? "border-blue-300 ring-1 ring-blue-300/60 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+                    }
+                  `}
                   onClick={() => {
                     setSelectedFarmer(farmer);
-                    // Center map on this farmer
+                    // Center map on this farmer and briefly show name tooltip on the marker
                     if (window.centerOnFarmer) {
                       window.centerOnFarmer(farmer.name);
                     }
+                    scrollToFarmer(farmer);
                   }}
+                  onMouseEnter={() => setHoveredFarmer(farmer.name)}
+                  onMouseLeave={() =>
+                    setHoveredFarmer((prev) =>
+                      prev === farmer.name ? null : prev
+                    )
+                  }
                 >
                   <h3 className="font-semibold text-slate-900 mb-2">
                     {farmer.name}
@@ -369,13 +494,23 @@ export default function Farmers() {
         </div>
 
         {/* Right Half - Map */}
-        <div className="w-1/2">
+        <div
+          className={`w-full md:w-1/2 ${
+            mobileView === "map" ? "h-[65vh]" : "h-0 overflow-hidden"
+          } md:h-auto`}
+        >
           <div
             ref={mapRef}
             className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
           />
         </div>
       </div>
+      {/* Hide default Google Maps InfoWindow close X for a cleaner look */}
+      <style>{`
+        .farmers-page .gm-ui-hover-effect {
+          display: none !important;
+        }
+      `}</style>
     </section>
   );
 }
