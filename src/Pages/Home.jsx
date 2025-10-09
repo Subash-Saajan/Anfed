@@ -1,16 +1,17 @@
 import { useLayoutEffect, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { TextPlugin } from "gsap/TextPlugin";
 import bgImage from "../assets/Banner4.png";
 import UpComingEvents from "../components/upComingEvents";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
 export default function Home() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
   const buttonRef = useRef(null);
-  const heroImageRef = useRef(null); // only image
+  const heroImageRef = useRef(null);
 
   cardsRef.current = [];
   const addToRefs = (el) => {
@@ -23,18 +24,9 @@ export default function Home() {
         defaults: { ease: "power3.out", duration: 1.2 },
       });
 
-      // Hero image initial animation
-      tl.from(heroImageRef.current, {
-        scale: 1.2,
-        opacity: 0,
-        duration: 1.5,
-        ease: "power4.out",
-      })
-        .from(
-          ".hero-hover .text-2xl",
-          { y: 30, opacity: 0, duration: 0.8 },
-          "-=1.2"
-        )
+      // Hero animation
+      tl.from(heroImageRef.current, { scale: 1.2, opacity: 0, duration: 1.5, ease: "power4.out" })
+        .from(".hero-hover .text-2xl", { y: 30, opacity: 0, duration: 0.8 }, "-=1.2")
         .from(".hero-hover h2", { y: 50, opacity: 0, duration: 1.1 }, "-=1")
         .from(buttonRef.current, {
           opacity: 0,
@@ -43,19 +35,38 @@ export default function Home() {
           ease: "back.out(1.7)",
         });
 
-      // Cards scroll animation
-      cardsRef.current.forEach((card, i) => {
+      // Cards + Impact cards scroll animation & number count
+      cardsRef.current.forEach((card) => {
+        const numberEl = card.querySelector("span[data-target]");
+        if (numberEl) {
+          const target = +numberEl.getAttribute("data-target");
+          gsap.fromTo(
+            numberEl,
+            { innerText: 0 },
+            {
+              innerText: target,
+              duration: 2,
+              ease: "power1.out",
+              snap: { innerText: 1 },
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+
         gsap.from(card, {
+          y: 50,
+          opacity: 0,
+          duration: 1.2,
+          ease: "power3.out",
           scrollTrigger: {
             trigger: card,
             start: "top 85%",
             toggleActions: "play none none reverse",
           },
-          y: 50,
-          opacity: 0,
-          duration: 1.2,
-          delay: i * 0.15,
-          ease: "power3.out",
         });
       });
 
@@ -149,8 +160,6 @@ export default function Home() {
             Farmer Producer Company Ltd
           </h2>
         </div>
-
-        {/* Hero button */}
         <div className="absolute bottom-6 left-10 z-20">
           <button
             ref={buttonRef}
@@ -170,20 +179,18 @@ export default function Home() {
             </h3>
           </div>
           <p className="mt-2 text-sm sm:text-base font-medium text-gray-800">
-            Overview title goes here
+            Rooted in Tradition, Growing for the Future
           </p>
           <div className="mt-1 text-[12px] sm:text-sm text-gray-700 leading-relaxed font-medium">
             <p className="mt-1">
-              Overview paragraph goes here overview paragraph goes here overview
-              paragraph goes here
-            </p>
-            <p className="mt-1">
-              Overview paragraph goes here overview paragraph goes here
+              Born from the revival of the Anuman River, ANFED FPO unites farmers to promote sustainable,
+              natural, and herbal farming. We bridge the gap between farmers and consumers through direct
+              market linkages, ensuring fair prices, transparency, and trust.
             </p>
           </div>
         </div>
 
-        {/* Cards */}
+        {/* Overview Cards */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-7 justify-center justify-items-center">
           {[1, 2, 3].map((item) => (
             <div
@@ -210,7 +217,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Events Section */}
+      {/* Our Impact Section */}
+<section className="mt-16 ml-3 mr-3">
+  <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">
+    Our Impact in Numbers
+  </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    {[
+      { emoji: "👨‍🌾", number: 400, description: "Farmers empowered through natural farming" },
+      { emoji: "🛒", number: 15, description: "Outlets under ANFED MART" },
+      { emoji: "🌾", number: 1800, description: "Acres under natural cultivation" },
+      { emoji: "💧", number: 22, description: "Waterbodies revived in the Anuman Nathi basin" },
+    ].map((impact, index) => (
+      <div
+        key={index}
+        ref={addToRefs}
+        className="impact-item relative p-6 flex flex-col items-center text-center rounded-xl bg-white shadow-sm border-2 border-gray-200 overflow-hidden"
+      >
+        {/* Light grey border overlay */}
+        <div className="absolute inset-0 rounded-xl border border-gray-200 -z-10"></div>
+
+        <span className="text-4xl mb-4 z-10">{impact.emoji}</span>
+        <span className="text-3xl font-extrabold mb-2 z-10" data-target={impact.number}>
+          0
+        </span>
+        <p className="text-gray-500 z-10">{impact.description}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+      {/* Upcoming Events Section */}
       <section className="upcoming-section mt-15 ml-3 mr-3">
         <div className="flex items-center gap-3 mb-6">
           <span className="h-[6px] w-12 bg-[#448800]"></span>
