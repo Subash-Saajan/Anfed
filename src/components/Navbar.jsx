@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <header
       ref={navbarRef}
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-300"
+      className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-50"
     >
       <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between">
         {/* Logo + Name */}
@@ -68,14 +68,16 @@ export default function Navbar() {
 
         {/* Contact + Hamburger */}
         <div className="flex items-center gap-3">
-          <button
-            ref={contactRef}
-            className="bg-[#448800] font-bold rounded-full transform-gpu transition-transform duration-300 ease-out hover:scale-105 active:scale-100 focus:outline-none px-4 py-2 text-white text-center"
-          >
-            Contact
-          </button>
+              <NavLink
+        to="/contact"
+        ref={contactRef}
+        className="bg-[#448800] font-bold rounded-full transform-gpu transition-transform duration-300 ease-out hover:scale-105 active:scale-100 focus:outline-none px-4 py-2 text-white text-center"
+      >
+        Contact
+      </NavLink>
 
-          <button
+
+          <button 
             onClick={() => setOpen((v) => !v)}
             className="md:hidden p-2 rounded-md hover:bg-slate-100"
             aria-label="Toggle menu"

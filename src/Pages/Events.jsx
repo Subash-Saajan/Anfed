@@ -4,40 +4,50 @@ import { ref as sRef, deleteObject } from "firebase/storage";
 import { db, storage, auth } from "../firebase";
 import EventCard from "../components/EventCard";
 import { onAuthStateChanged } from "firebase/auth";
-import { getDownloadURL } from "firebase/storage";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  // Preload all images
+  const preloadImages = (urls) => {
+    return Promise.all(
+      urls.map(
+        (url) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = resolve;
+            img.onerror = resolve; // resolve anyway if error
+          })
+      )
+    );
+  };
+
   useEffect(() => {
     const q = query(collection(db, "events"), orderBy("date", "asc"));
     const unsub = onSnapshot(
       q,
       async (snap) => {
-        const docs = await Promise.all(
-          snap.docs.map(async (d) => {
-            const data = d.data();
-            let imageUrl = data.imageUrl || "";
-            if (!imageUrl && data.storagePath) {
-              try {
-                imageUrl = await getDownloadURL(ref(storage, data.storagePath));
-              } catch (err) {
-                console.warn("failed to getDownloadURL for", data.storagePath, err);
-              }
-            }
-            return {
-              id: d.id,
-              title: data.title || "",
-              description: data.description || "",
-              location: data.location || data.place || "",
-              date: data.date || data.createdAt || null,
-              imageUrl,
-              storagePath: data.storagePath || "",
-            };
-          })
-        );
+        const docs = snap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            title: data.title || "",
+            shortDesc: data.shortDesc || data.description || "",
+            location: data.location || data.place || "",
+            date: data.date || data.createdAt || null,
+            thumbnailUrl: data.thumbnailUrl || "",
+            thumbnailPath: data.thumbnailPath || "",
+            galleryUrls: data.galleryUrls || [],
+          };
+        });
+
+        // Preload all images (thumbnails + gallery)
+        const allImageUrls = docs.flatMap((d) => [d.thumbnailUrl, ...(d.galleryUrls || [])]).filter(Boolean);
+        await preloadImages(allImageUrls);
+
         setEvents(docs);
         setLoading(false);
       },
@@ -59,45 +69,36 @@ export default function Events() {
     if (!ok) return;
 
     try {
-      // determine storage path:
-      let storagePath = event.storagePath || event.imagePath || event.storage_path;
-
-      // if not stored, try to parse it from a download URL like:
-      // https://firebasestorage.googleapis.com/v0/b/<bucket>/o/<encodedPath>?alt=media&token=...
-      if (!storagePath && event.imageUrl) {
-        try {
-          const parts = event.imageUrl.split("/o/");
-          if (parts[1]) {
-            storagePath = decodeURIComponent(parts[1].split("?")[0]);
+      if (event.thumbnailPath) await deleteObject(sRef(storage, event.thumbnailPath));
+      if (event.galleryUrls?.length) {
+        for (const url of event.galleryUrls) {
+          try {
+            const parts = url.split("/o/");
+            if (parts[1]) {
+              const path = decodeURIComponent(parts[1].split("?")[0]);
+              await deleteObject(sRef(storage, path));
+            }
+          } catch (err) {
+            console.warn("Failed to delete gallery image:", err);
           }
-        } catch (e) {
-          console.warn("Could not parse storage path from imageUrl", e);
         }
       }
-
-      // delete storage object if we have a path
-      if (storagePath) {
-        try {
-          await deleteObject(sRef(storage, storagePath));
-          console.log("Storage object deleted:", storagePath);
-        } catch (err) {
-          console.warn("Failed to delete storage object (may be permission or already removed):", err);
-          // continue to try removing the Firestore doc anyway
-        }
-      } else {
-        console.warn("No storagePath found on event; skipping storage deletion.");
-      }
-
-      // delete Firestore document
       await deleteDoc(doc(db, "events", event.id));
-      console.log("Firestore doc deleted:", event.id);
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Delete failed: " + (err.message || err));
     }
   };
 
-  if (loading) return <div className="p-6">Loading events…</div>;
+  // Minimal modern full-screen spinner
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   if (!events.length) return <div className="p-6">No upcoming events.</div>;
 
   return (
@@ -107,9 +108,9 @@ export default function Events() {
       <div
         className="
           grid gap-6
-          grid-cols-2                                  /* mobile: 2 cols */
-          md:[grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] /* md+: auto-fit -> 2/3/4 depending on width */
-          xl:[grid-template-columns:repeat(4,minmax(0,1fr))]            /* cap at 4 on very wide screens */
+          grid-cols-2
+          md:[grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]
+          xl:[grid-template-columns:repeat(4,minmax(0,1fr))]
         "
       >
         {events.map((ev) => (

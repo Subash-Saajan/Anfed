@@ -115,7 +115,7 @@ export default function About() {
       <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
         ABOUT US
       </h1>
-      <p className="text-slate-600 leading-relaxed text-base md:text-md">
+      <p className="text-slate-600 leading-relaxed text-base md:text-lg">
         Rooted in the Anuman River basin of the Western Ghats, our journey began
         with the revival of Hanumannathi (Anuman River)—a lifeline for farmers
         across Radhapuram Taluk in Tirunelveli District. Once weakened by
