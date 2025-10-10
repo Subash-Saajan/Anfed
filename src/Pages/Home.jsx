@@ -165,7 +165,7 @@ export default function Home() {
         </div>
         <div className="absolute bottom-20 left-10 text-white z-10">
           <h2 className="text-4xl font-bold">
-            numan Nadhi Fed <br />
+            Anuman Nadhi Fed <br />
             Farmer Producer Company Ltd
           </h2>
         </div>
