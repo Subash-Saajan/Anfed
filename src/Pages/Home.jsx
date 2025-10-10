@@ -5,6 +5,11 @@ import { TextPlugin } from "gsap/TextPlugin";
 import bgImage from "../assets/Banner4.png";
 import UpComingEvents from "../components/upComingEvents";
 import StatisticsCard from "../components/StatisticsCard";
+import Rectangle34 from "../assets/Rectangle34.png";
+import Rectangle35 from "../assets/Rectangle35.png";
+import Rectangle36 from "../assets/Rectangle36.png";
+import Rectangle37 from "../assets/Rectangle37.png";
+
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
@@ -233,28 +238,28 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <StatisticsCard
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle34.png"
+            imageSrc={Rectangle34}
             number={400}
             description="Farmers empowered through natural farming"
             dataTarget={400}
           />
           <StatisticsCard
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle35.png"
+            imageSrc={Rectangle35}
             number={10}
             description="Outlets under ANFED MART"
             dataTarget={10}
           />
           <StatisticsCard
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle36.png"
+            imageSrc={Rectangle36}
             number={1800}
             description="Acres under natural cultivation"
             dataTarget={1800}
           />
           <StatisticsCard
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle37.png"
+            imageSrc={Rectangle37}
             number={22}
             description="Waterbodies revived in the Anuman Nathi basin"
             dataTarget={22}
