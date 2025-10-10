@@ -234,9 +234,10 @@ export default function Home() {
       </section>
 
       {/* Statistics Cards Section */}
-      <section className="mt-16 ml-5 mr-5">
+      <section className="mt-16 ml-4 mr-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatisticsCard
+          {/* Farmers Empowered Card */}
+          <div
             ref={addToRefs}
             imageSrc={Rectangle34}
             number={400}
