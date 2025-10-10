@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
 import bgImage from "../assets/Banner4.png";
 import UpComingEvents from "../components/upComingEvents";
+import StatisticsCard from "../components/StatisticsCard";
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
@@ -25,8 +26,17 @@ export default function Home() {
       });
 
       // Hero animation
-      tl.from(heroImageRef.current, { scale: 1.2, opacity: 0, duration: 1.5, ease: "power4.out" })
-        .from(".hero-hover .text-2xl", { y: 30, opacity: 0, duration: 0.8 }, "-=1.2")
+      tl.from(heroImageRef.current, {
+        scale: 1.2,
+        opacity: 0,
+        duration: 1.5,
+        ease: "power4.out",
+      })
+        .from(
+          ".hero-hover .text-2xl",
+          { y: 30, opacity: 0, duration: 0.8 },
+          "-=1.2"
+        )
         .from(".hero-hover h2", { y: 50, opacity: 0, duration: 1.1 }, "-=1")
         .from(buttonRef.current, {
           opacity: 0,
@@ -183,9 +193,10 @@ export default function Home() {
           </p>
           <div className="mt-1 text-[12px] sm:text-sm text-gray-700 leading-relaxed font-medium">
             <p className="mt-1">
-              Born from the revival of the Anuman River, ANFED FPO unites farmers to promote sustainable,
-              natural, and herbal farming. We bridge the gap between farmers and consumers through direct
-              market linkages, ensuring fair prices, transparency, and trust.
+              Born from the revival of the Anuman River, ANFED FPO unites
+              farmers to promote sustainable, natural, and herbal farming. We
+              bridge the gap between farmers and consumers through direct market
+              linkages, ensuring fair prices, transparency, and trust.
             </p>
           </div>
         </div>
@@ -217,35 +228,86 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Our Impact Section */}
-<section className="mt-16 ml-3 mr-3">
-  <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">
-    Our Impact in Numbers
-  </h3>
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-    {[
-      { emoji: "👨‍🌾", number: 400, description: "Farmers empowered through natural farming" },
-      { emoji: "🛒", number: 15, description: "Outlets under ANFED MART" },
-      { emoji: "🌾", number: 1800, description: "Acres under natural cultivation" },
-      { emoji: "💧", number: 22, description: "Waterbodies revived in the Anuman Nathi basin" },
-    ].map((impact, index) => (
-      <div
-        key={index}
-        ref={addToRefs}
-        className="impact-item relative p-6 flex flex-col items-center text-center rounded-xl bg-white shadow-sm border-2 border-gray-200 overflow-hidden"
-      >
-        {/* Light grey border overlay */}
-        <div className="absolute inset-0 rounded-xl border border-gray-200 -z-10"></div>
+      {/* Statistics Cards Section */}
+      <section className="mt-16 ml-5 mr-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatisticsCard
+            ref={addToRefs}
+            imageSrc="/src/assets/Rectangle34.png"
+            number={400}
+            description="Farmers empowered through natural farming"
+            dataTarget={400}
+          />
+          <StatisticsCard
+            ref={addToRefs}
+            imageSrc="/src/assets/Rectangle35.png"
+            number={10}
+            description="Outlets under ANFED MART"
+            dataTarget={10}
+          />
+          <StatisticsCard
+            ref={addToRefs}
+            imageSrc="/src/assets/Rectangle36.png"
+            number={1800}
+            description="Acres under natural cultivation"
+            dataTarget={1800}
+          />
+          <StatisticsCard
+            ref={addToRefs}
+            imageSrc="/src/assets/Rectangle37.png"
+            number={22}
+            description="Waterbodies revived in the Anuman Nathi basin"
+            dataTarget={22}
+          />
+        </div>
+      </section>
 
-        <span className="text-4xl mb-4 z-10">{impact.emoji}</span>
-        <span className="text-3xl font-extrabold mb-2 z-10" data-target={impact.number}>
-          0
-        </span>
-        <p className="text-gray-500 z-10">{impact.description}</p>
-      </div>
-    ))}
-  </div>
-</section>
+      {/* Our Impact Section */}
+      <section className="mt-16 ml-3 mr-3">
+        <h3 className="text-2xl font-bold text-gray-800 mb-8 text-center">
+          Our Impact in Numbers
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {[
+            {
+              emoji: "👨‍🌾",
+              number: 400,
+              description: "Farmers empowered through natural farming",
+            },
+            {
+              emoji: "🛒",
+              number: 15,
+              description: "Outlets under ANFED MART",
+            },
+            {
+              emoji: "🌾",
+              number: 1800,
+              description: "Acres under natural cultivation",
+            },
+            {
+              emoji: "💧",
+              number: 22,
+              description: "Waterbodies revived in the Anuman Nathi basin",
+            },
+          ].map((impact, index) => (
+            <div
+              key={index}
+              ref={addToRefs}
+              className="impact-item relative p-6 flex flex-col items-center text-center rounded-xl bg-white shadow-sm border-2 border-gray-200 overflow-hidden">
+              {/* Light grey border overlay */}
+              <div className="absolute inset-0 rounded-xl border border-gray-200 -z-10"></div>
+
+              <span className="text-4xl mb-4 z-10">{impact.emoji}</span>
+              <span
+                className="text-3xl font-extrabold mb-2 z-10"
+                data-target={impact.number}>
+                0
+              </span>
+              <p className="text-gray-500 z-10">{impact.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Upcoming Events Section */}
       <section className="upcoming-section mt-15 ml-3 mr-3">
