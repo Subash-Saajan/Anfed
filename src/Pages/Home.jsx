@@ -4,7 +4,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
 import bgImage from "../assets/Banner4.png";
 import UpComingEvents from "../components/upComingEvents";
-import StatisticsCard from "../components/StatisticsCard";
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
@@ -229,36 +228,95 @@ export default function Home() {
       </section>
 
       {/* Statistics Cards Section */}
-      <section className="mt-16 ml-5 mr-5">
+      <section className="mt-16 ml-4 mr-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatisticsCard
+          {/* Farmers Empowered Card */}
+          <div
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle34.png"
-            number={400}
-            description="Farmers empowered through natural farming"
-            dataTarget={400}
-          />
-          <StatisticsCard
+            className="relative rounded-xl overflow-hidden shadow-lg h-110 w-full group">
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-150"
+              style={{ backgroundImage: "url(/src/assets/Rectangle34.png)" }}
+            />
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="text-white">
+                <div
+                  className="text-4xl sm:text-5xl font-bold mb-2"
+                  data-target={400}>
+                  400
+                </div>
+                <p className="text-xl font-medium sm:text-base leading-tight">
+                  Farmers empowered through natural farming
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ANFED MART Outlets Card */}
+          <div
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle35.png"
-            number={10}
-            description="Outlets under ANFED MART"
-            dataTarget={10}
-          />
-          <StatisticsCard
+            className="relative rounded-xl overflow-hidden shadow-lg h-110 w-full group">
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-150"
+              style={{ backgroundImage: "url(/src/assets/Rectangle35.png)" }}
+            />
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="text-white">
+                <div
+                  className="text-4xl sm:text-5xl font-bold mb-2"
+                  data-target={10}>
+                  10
+                </div>
+                <p className="text-xl font-medium sm:text-base leading-tight">
+                  Outlets under ANFED MART
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Natural Cultivation Card */}
+          <div
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle36.png"
-            number={1800}
-            description="Acres under natural cultivation"
-            dataTarget={1800}
-          />
-          <StatisticsCard
+            className="relative rounded-xl overflow-hidden shadow-lg h-110 w-full group">
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-150"
+              style={{ backgroundImage: "url(/src/assets/Rectangle36.png)" }}
+            />
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="text-white">
+                <div
+                  className="text-4xl sm:text-5xl font-bold mb-2"
+                  data-target={1800}>
+                  1800
+                </div>
+                <p className="text-xl font-medium sm:text-base leading-tight">
+                  Acres under natural cultivation
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Waterbodies Revived Card */}
+          <div
             ref={addToRefs}
-            imageSrc="/src/assets/Rectangle37.png"
-            number={22}
-            description="Waterbodies revived in the Anuman Nathi basin"
-            dataTarget={22}
-          />
+            className="relative rounded-xl overflow-hidden shadow-lg h-110 w-full group">
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-150"
+              style={{ backgroundImage: "url(/src/assets/Rectangle37.png)" }}
+            />
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div className="text-white">
+                <div
+                  className="text-4xl sm:text-5xl font-bold mb-2"
+                  data-target={22}>
+                  22
+                </div>
+                <p className="text-xl font-medium sm:text-base leading-tight">
+                  Waterbodies revived in the Anuman Nathi basin
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
