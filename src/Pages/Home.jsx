@@ -237,13 +237,14 @@ export default function Home() {
       <section className="mt-16 ml-4 mr-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Farmers Empowered Card */}
-          <div
-            ref={addToRefs}
-            imageSrc={Rectangle34}
-            number={400}
-            description="Farmers empowered through natural farming"
-            dataTarget={400}
-          />
+          
+          <StatisticsCard
+          ref={addToRefs}
+          imageSrc={Rectangle34}
+          number={400}
+          description="Farmers empowered through natural farming"
+          dataTarget={400}
+        />
           <StatisticsCard
             ref={addToRefs}
             imageSrc={Rectangle35}
