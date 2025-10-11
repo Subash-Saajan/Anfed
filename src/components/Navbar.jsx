@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <header
       ref={navbarRef}
-      className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-50"
+      className="sticky top-0 z-50 bg-white/65 backdrop-blur "
     >
       <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between">
         {/* Logo + Name */}
