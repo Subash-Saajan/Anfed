@@ -12,20 +12,7 @@ export default function Events() {
   const [user, setUser] = useState(null);
   const cardsRef = useRef([]);
 
-  // Preload images
-  const preloadImages = (urls) =>
-    Promise.all(
-      urls.map(
-        (url) =>
-          new Promise((resolve) => {
-            const img = new Image();
-            img.src = url;
-            img.onload = resolve;
-            img.onerror = resolve;
-          })
-      )
-    );
-
+  // Fetch events from Firestore
   useEffect(() => {
     const q = query(collection(db, "events"), orderBy("date", "asc"));
     const unsub = onSnapshot(
@@ -52,13 +39,10 @@ export default function Events() {
               date: data.date ? new Date(data.date.seconds * 1000) : new Date(),
               thumbnailUrl: thumbUrl,
               thumbnailPath: data.thumbnailPath || "",
-              galleryUrls: data.galleryUrls || [],
+              galleryPaths: data.galleryUrls || [],
             };
           })
         );
-
-        const allImageUrls = docs.flatMap((d) => [d.thumbnailUrl, ...(d.galleryUrls || [])]).filter(Boolean);
-        await preloadImages(allImageUrls);
 
         setEvents(docs);
         setLoading(false);
@@ -71,12 +55,13 @@ export default function Events() {
     return () => unsub();
   }, []);
 
+  // Listen to auth state
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => setUser(u));
     return unsub;
   }, []);
 
-  // GSAP animation
+  // Animate cards
   useEffect(() => {
     if (events.length && cardsRef.current.length) {
       gsap.from(cardsRef.current, {
@@ -89,20 +74,17 @@ export default function Events() {
     }
   }, [events]);
 
+  // Delete event
   const handleDelete = async (event) => {
     const ok = confirm(`Delete event "${event.title}"? This cannot be undone.`);
     if (!ok) return;
 
     try {
       if (event.thumbnailPath) await deleteObject(sRef(storage, event.thumbnailPath));
-      if (event.galleryUrls?.length) {
-        for (const url of event.galleryUrls) {
+      if (event.galleryPaths?.length) {
+        for (const path of event.galleryPaths) {
           try {
-            const parts = url.split("/o/");
-            if (parts[1]) {
-              const path = decodeURIComponent(parts[1].split("?")[0]);
-              await deleteObject(sRef(storage, path));
-            }
+            await deleteObject(sRef(storage, path));
           } catch (err) {
             console.warn("Failed to delete gallery image:", err);
           }
@@ -128,15 +110,19 @@ export default function Events() {
   const pastEvents = events.filter((e) => e.date < now);
 
   return (
-    <div className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-4 sm:px-6 py-8">
+      {/* Upcoming Events */}
       <h1 className="text-2xl font-bold mb-6">Upcoming Events</h1>
-
-      {/* Horizontal scroll for upcoming events */}
       <div className="flex gap-4 overflow-x-auto pb-4">
         {upcomingEvents.length ? (
           upcomingEvents.map((ev, idx) => (
-            <div key={ev.id} className="flex-shrink-0 w-[280px]">
-              <EventCard event={ev} isAdmin={!!user} onDelete={handleDelete} ref={(el) => (cardsRef.current[idx] = el)} />
+            <div key={ev.id} className="flex-shrink-0 w-[90%] sm:w-[280px] md:w-[240px] lg:w-[280px]">
+              <EventCard
+                event={ev}
+                isAdmin={!!user}
+                onDelete={handleDelete}
+                ref={(el) => (cardsRef.current[idx] = el)}
+              />
             </div>
           ))
         ) : (
@@ -144,20 +130,18 @@ export default function Events() {
         )}
       </div>
 
+      {/* Past Events */}
       <h1 className="text-2xl font-bold my-6">Past Events</h1>
-
-      {/* Grid layout for past events */}
       {pastEvents.length ? (
-        <div
-          className="
-            grid gap-6
-            grid-cols-2
-            md:[grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]
-            xl:[grid-template-columns:repeat(4,minmax(0,1fr))]
-          "
-        >
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {pastEvents.map((ev, idx) => (
-            <EventCard key={ev.id} event={ev} isAdmin={!!user} onDelete={handleDelete} ref={(el) => (cardsRef.current[idx] = el)} />
+            <EventCard
+              key={ev.id}
+              event={ev}
+              isAdmin={!!user}
+              onDelete={handleDelete}
+              ref={(el) => (cardsRef.current[idx] = el)}
+            />
           ))}
         </div>
       ) : (

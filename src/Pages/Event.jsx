@@ -24,14 +24,22 @@ export default function Event() {
   const [galleryUrls, setGalleryUrls] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const containerRef = useRef(null);
-  const itemRefs = useRef([]);
+  // Refs for GSAP
+  const textAndThumbnailRefs = useRef([]);
+  const galleryRefs = useRef([]);
 
-  itemRefs.current = [];
+  textAndThumbnailRefs.current = [];
+  galleryRefs.current = [];
 
-  const addToRefs = (el) => {
-    if (el && !itemRefs.current.includes(el)) {
-      itemRefs.current.push(el);
+  const addTextRef = (el) => {
+    if (el && !textAndThumbnailRefs.current.includes(el)) {
+      textAndThumbnailRefs.current.push(el);
+    }
+  };
+
+  const addGalleryRef = (el) => {
+    if (el && !galleryRefs.current.includes(el)) {
+      galleryRefs.current.push(el);
     }
   };
 
@@ -79,19 +87,21 @@ export default function Event() {
     };
   }, [id]);
 
-  // GSAP animation for individual components after loading
+  // GSAP animation
   useEffect(() => {
-    if (!isLoading && itemRefs.current.length > 0) {
+    if (!isLoading) {
+      // Animate text and thumbnail
       gsap.fromTo(
-        itemRefs.current,
+        textAndThumbnailRefs.current,
         { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          stagger: 0.15,
-        }
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.15, ease: "power2.out" }
+      );
+
+      // Animate gallery images faster
+      gsap.fromTo(
+        galleryRefs.current,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: "power2.out" }
       );
     }
   }, [isLoading]);
@@ -108,7 +118,6 @@ export default function Event() {
       {isLoading && spinner}
 
       <div
-        ref={containerRef}
         className={`min-h-screen max-w-6xl mx-auto mt-10 p-4 grid grid-cols-1 md:grid-cols-2 gap-6 ${
           isLoading ? "hidden" : ""
         }`}
@@ -117,33 +126,30 @@ export default function Event() {
         <div className="flex flex-col flex-1 gap-4">
           {thumbnailUrl && (
             <img
-              ref={addToRefs}
+              ref={addTextRef}
               src={thumbnailUrl}
               alt={event?.title}
               className="w-full h-64 object-cover rounded-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer"
             />
           )}
-          <div ref={addToRefs} className="text-sm text-violet-600">
+          <div ref={addTextRef} className="text-sm text-violet-600">
             {formatDate(event?.date)}
           </div>
-          <h1
-            ref={addToRefs}
-            className="text-3xl font-bold mt-2"
-          >
+          <h1 ref={addTextRef} className="text-3xl font-bold mt-2">
             {event?.title}
           </h1>
           {event?.location && (
-            <div ref={addToRefs} className="text-gray-600 mt-1">
+            <div ref={addTextRef} className="text-gray-600 mt-1">
               {event.location}
             </div>
           )}
           {event?.shortDesc && (
-            <p ref={addToRefs} className="text-gray-700">
+            <p ref={addTextRef} className="text-gray-700">
               {event.shortDesc}
             </p>
           )}
           {event?.fullDesc && (
-            <p ref={addToRefs} className="text-gray-700">
+            <p ref={addTextRef} className="text-gray-700">
               {event.fullDesc}
             </p>
           )}
@@ -153,7 +159,7 @@ export default function Event() {
         <div className="flex flex-col flex-1 gap-4 mt-6 md:mt-0 items-start">
           {event?.youtubeLink && (
             <div
-              ref={addToRefs}
+              ref={addTextRef}
               className="w-full aspect-video transform transition-transform duration-300 hover:scale-[1.02] cursor-pointer"
             >
               <iframe
@@ -167,17 +173,14 @@ export default function Event() {
           )}
 
           {galleryUrls.length > 0 && (
-            <div
-              ref={addToRefs}
-              className="grid grid-cols-2 gap-2 w-full"
-            >
+            <div className="grid grid-cols-2 gap-2 w-full">
               {galleryUrls.map((url, idx) => (
                 <img
                   key={idx}
                   src={url}
                   alt={`Gallery ${idx + 1}`}
                   className="w-full h-32 object-cover rounded-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-                  ref={addToRefs}
+                  ref={addGalleryRef}
                 />
               ))}
             </div>
