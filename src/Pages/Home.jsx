@@ -24,6 +24,8 @@ export default function Home() {
   const overviewParaRef = useRef(null);
   const buttonRef = useRef(null); 
   const heroImageRef = useRef(null);
+  const heroSubtitleRef = useRef(null);
+  const heroHeadingRef = useRef(null);
 
   statsCardsRef.current = [];
   overviewCardsRef.current = [];
@@ -36,14 +38,15 @@ export default function Home() {
     if (el && !overviewCardsRef.current.includes(el)) overviewCardsRef.current.push(el);
   };
 
+  // GSAP Animations
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out", duration: 1.2 } });
 
-      // Hero animation
+      // Hero section animation
       tl.from(heroImageRef.current, { scale: 1.2, opacity: 0, duration: 1.5, ease: "power4.out" })
-        .from(".hero-hover .text-2xl", { y: 30, opacity: 0, duration: 0.8 }, "-=1.2")
-        .from(".hero-hover h2", { y: 50, opacity: 0, duration: 1.1 }, "-=1")
+        .from(heroSubtitleRef.current, { opacity: 0, y: 30, duration: 0.8 }, "-=1.2")
+        .from(heroHeadingRef.current, { opacity: 0, y: 50, duration: 1.1 }, "-=1")
         .from(buttonRef.current, { opacity: 0, y: 20, duration: 0.8, ease: "back.out(1.7)" });
 
       // Overview section animations
@@ -108,6 +111,7 @@ export default function Home() {
     return () => ctx.revert();
   }, []);
 
+  // Hover effects
   useEffect(() => {
     // Hero image hover
     if (heroImageRef.current) {
@@ -137,14 +141,14 @@ export default function Home() {
       <div className="relative w-full h-80 rounded-xl overflow-hidden hero-hover">
         <img ref={heroImageRef} src={bgImage} alt="Hero" className="w-full h-full object-cover" />
 
-        {/* Small subtitle */}
+        {/* Subtitle */}
         <div className="absolute top-5 left-10 text-white z-10">
-          <p className="text-lg sm:text-2xl italic font-thin">Soil to Soul</p>
+          <p ref={heroSubtitleRef} className="text-lg sm:text-2xl italic font-thin">Soil to Soul</p>
         </div>
 
         {/* Main heading */}
         <div className="absolute bottom-20 left-10 text-white z-10">
-          <h2 className="text-2xl sm:text-4xl font-bold">
+          <h2 ref={heroHeadingRef} className="text-2xl sm:text-4xl font-bold">
             Anuman Nadhi Fed <br />
             Farmer Producer Company Ltd
           </h2>
