@@ -11,7 +11,6 @@ import Rectangle37 from "../assets/Rectangle37.png";
 import HomeEvents from "../components/HomeEvents";
 import CoreValues from "../components/CoreValues";
 import Initiatives from "../components/Initiatives";
-import KeyFocusAreas from "../components/KeyFocusAreas";
 import OverviewCards from "../components/OverviewCards";
 
 gsap.registerPlugin(ScrollTrigger, TextPlugin);
@@ -23,7 +22,7 @@ export default function Home() {
   const overviewHeaderRef = useRef(null);
   const overviewTextRef = useRef(null);
   const overviewParaRef = useRef(null);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef(null); 
   const heroImageRef = useRef(null);
 
   statsCardsRef.current = [];
@@ -137,17 +136,23 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative w-full h-80 rounded-xl overflow-hidden hero-hover">
         <img ref={heroImageRef} src={bgImage} alt="Hero" className="w-full h-full object-cover" />
+
+        {/* Small subtitle */}
         <div className="absolute top-5 left-10 text-white z-10">
-          <p className="text-2xl italic font-thin">Soil to Soul</p>
+          <p className="text-lg sm:text-2xl italic font-thin">Soil to Soul</p>
         </div>
+
+        {/* Main heading */}
         <div className="absolute bottom-20 left-10 text-white z-10">
-          <h2 className="text-4xl font-bold">
+          <h2 className="text-2xl sm:text-4xl font-bold">
             Anuman Nadhi Fed <br />
             Farmer Producer Company Ltd
           </h2>
         </div>
+
+        {/* Button */}
         <div className="absolute bottom-6 left-10 z-20">
-          <button ref={buttonRef} className="bg-white text-black text-md font-bold py-2 px-6 rounded-full">
+          <button ref={buttonRef} className="bg-white text-black text-sm sm:text-md font-bold py-2 px-6 rounded-full">
             About us
           </button>
         </div>
@@ -196,7 +201,6 @@ export default function Home() {
       {/* Other Sections */}
       <section>
         <CoreValues />
-        <KeyFocusAreas />
         <Initiatives />
       </section>
 
