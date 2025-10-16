@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useLayoutEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion as Motion } from "framer-motion";
@@ -6,6 +6,7 @@ import { motion as Motion } from "framer-motion";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function About() {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const teamMembers = [
     {
       name: "Parthiban",
@@ -169,7 +170,7 @@ export default function About() {
         </article>
       </section>
 
-      {/* Team - Center-Out Carousel (Framer Motion) */}
+      {/* Team - Arc Carousel with Navigation (Framer Motion) */}
       <section className="mx-auto max-w-7xl px-4 py-12">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
@@ -182,10 +183,52 @@ export default function About() {
           className="relative flex justify-center items-center w-full overflow-hidden px-2 sm:px-4 md:px-6"
           style={{ minHeight: "26rem" }}
         >
+          {/* Navigation controls */}
+          <button
+            aria-label="Previous"
+            onClick={() =>
+              setCurrentIndex(
+                (p) => (p - 1 + teamMembers.length) % teamMembers.length
+              )
+            }
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow border border-slate-200 flex items-center justify-center text-slate-700"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button
+            aria-label="Next"
+            onClick={() => setCurrentIndex((p) => (p + 1) % teamMembers.length)}
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow border border-slate-200 flex items-center justify-center text-slate-700"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+
           {teamMembers.map((m, i) => {
-            const center = (teamMembers.length - 1) / 2;
-            const offset = i - center;
-            const abs = Math.abs(offset);
+            // Wrap-relative offset from currentIndex
+            let diff = i - currentIndex;
+            const n = teamMembers.length;
+            const half = Math.floor(n / 2);
+            if (diff > half) diff -= n;
+            if (diff < -half) diff += n;
+            const abs = Math.abs(diff);
             // Wider spacing and curved arc
             const spread = 220; // px spacing horizontally
             const curve = 24; // px vertical per step
@@ -198,15 +241,10 @@ export default function About() {
                 animate={{
                   scale: 1 - abs * 0.08,
                   opacity: 1 - abs * 0.18,
-                  x: offset * spread,
+                  x: diff * spread,
                   y: yOffset,
                 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 14,
-                  delay: abs * 0.06,
-                }}
+                transition={{ type: "spring", stiffness: 120, damping: 18 }}
                 className="absolute top-0"
                 style={{ zIndex }}
               >
