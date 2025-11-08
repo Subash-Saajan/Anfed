@@ -128,11 +128,37 @@ export default function Home() {
     }
 
     // Card hover effects
-    [...overviewCardsRef.current, ...statsCardsRef.current].forEach((card) => {
-      gsap.set(card, { transformOrigin: "center center" });
-      card.addEventListener("mouseenter", () => gsap.to(card, { scale: 1.05, duration: 0.5, ease: "power3.out" }));
-      card.addEventListener("mouseleave", () => gsap.to(card, { scale: 1, duration: 0.5, ease: "power3.out" }));
-    });
+    // Card hover effects (only overview cards)
+overviewCardsRef.current.forEach((card) => {
+  gsap.set(card, { transformOrigin: "center center" });
+  card.addEventListener("mouseenter", () => gsap.to(card, { scale: 1.05, duration: 0.5, ease: "power3.out" }));
+  card.addEventListener("mouseleave", () => gsap.to(card, { scale: 1, duration: 0.5, ease: "power3.out" }));
+});
+
+// Stats card hover effect (only image zoom)
+// Stats card image hover effect
+// Stats card hover effect (background div zoom)
+statsCardsRef.current.forEach((card) => {
+  const bgDiv = card.querySelector("div.absolute.inset-0"); // select background div
+  if (!bgDiv) return;
+
+  gsap.set(bgDiv, { transformOrigin: "center center" });
+
+  // Remove previous listeners to avoid duplicates
+  card.onmouseenter = null;
+  card.onmouseleave = null;
+
+  card.addEventListener("mouseenter", () => {
+    gsap.to(bgDiv, { scale: 1.1, duration: 0.5, ease: "power3.out" });
+  });
+
+  card.addEventListener("mouseleave", () => {
+    gsap.to(bgDiv, { scale: 1, duration: 0.5, ease: "power3.out" });
+  });
+});
+
+
+
   }, []);
 
   return (

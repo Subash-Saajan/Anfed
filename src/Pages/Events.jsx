@@ -66,14 +66,15 @@ export default function Events() {
     if (events.length && cardsRef.current.length) {
       gsap.from(cardsRef.current, {
         opacity: 0,
-        y: 30,
-        stagger: 0.15,
-        duration: 0.6,
-        ease: "power3.out",
+        y: 60,               // move more
+        scale: 0.95,         // start slightly smaller
+        stagger: 0.15,       // stagger each card
+        duration: 0.8,       // longer duration
+          
       });
     }
   }, [events]);
-
+  
   // Delete event
   const handleDelete = async (event) => {
     const ok = confirm(`Delete event "${event.title}"? This cannot be undone.`);

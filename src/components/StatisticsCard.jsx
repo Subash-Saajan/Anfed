@@ -8,7 +8,7 @@ const StatisticsCard = forwardRef(
         className="relative rounded-xl overflow-hidden shadow-lg h-110 w-full group">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out group-hover:scale-105"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat "
           style={{ backgroundImage: `url(${imageSrc})` }}
         />
 

@@ -11,6 +11,7 @@ import About from "./Pages/About";
 import Footer from "./components/Footer";
 import Farmers from "./Pages/Farmers";
 import Event from "./Pages/Event"; // import the new Event page
+import Services from "./Pages/Services"; // added service page import
 import "./App.css";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} /> {/* new services route */}
           <Route path="/events" element={<Events />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/farmers" element={<Farmers />} />
