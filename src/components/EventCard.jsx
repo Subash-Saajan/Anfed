@@ -27,10 +27,10 @@ const EventCard = React.forwardRef(({ event, onDelete, isAdmin }, ref) => {
   return (
     <article
       ref={ref}
-      className="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-200 relative flex flex-col h-[520px]"
+      className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md border border-slate-200 relative flex flex-col h-full"
     >
       {/* Image Section */}
-      <div className="w-full h-48 md:h-56 overflow-hidden relative flex-shrink-0">
+      <div className="w-full aspect-[4/3] overflow-hidden relative flex-shrink-0">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -38,21 +38,21 @@ const EventCard = React.forwardRef(({ event, onDelete, isAdmin }, ref) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
-            Loading image...
+          <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs sm:text-sm">
+            Loading...
           </div>
         )}
 
         {isAdmin && (
-          <div className="absolute top-3 right-3 flex gap-2">
+          <div className="absolute top-2 right-2 flex gap-1">
             <button
               onClick={() => onDelete && onDelete(event)}
-              className="bg-white/90 hover:bg-white text-red-600 p-2 rounded-full shadow border"
+              className="bg-white/90 hover:bg-white text-red-600 p-1.5 sm:p-2 rounded-full shadow border"
               title="Delete event"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
+                className="w-3 h-3 sm:w-4 sm:h-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -70,12 +70,12 @@ const EventCard = React.forwardRef(({ event, onDelete, isAdmin }, ref) => {
       </div>
 
       {/* Content Section */}
-      <div className="p-5 flex flex-col justify-between flex-1 overflow-hidden">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 text-sm text-violet-600 mb-2">
+      <div className="p-3 sm:p-4 flex flex-col justify-between flex-1">
+        <div className="flex-1 min-h-0">
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-green-600 mb-1.5 sm:mb-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-slate-400"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -87,25 +87,25 @@ const EventCard = React.forwardRef(({ event, onDelete, isAdmin }, ref) => {
                 d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span>{formatDate(date)}</span>
+            <span className="font-medium">{formatDate(date)}</span>
           </div>
 
-          <h3 className="text-2xl font-extrabold text-slate-900 leading-tight">
+          <h3 className="text-sm sm:text-lg font-bold text-slate-900 leading-tight line-clamp-2">
             {title}
           </h3>
           {location && (
-            <div className="text-sm text-slate-500 mt-1">{location}</div>
+            <div className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1 line-clamp-1">{location}</div>
           )}
-          <p className="mt-4 text-slate-700 text-sm line-clamp-3">
+          <p className="mt-1.5 sm:mt-2 text-slate-600 text-xs sm:text-sm line-clamp-2 sm:line-clamp-3 hidden sm:block">
             {shortDesc}
           </p>
         </div>
 
-        {/* Full-width Button */}
+        {/* Button */}
         <button
           type="button"
           onClick={() => navigate(`/event/${id}`)}
-          className="mt-6 w-full bg-[#448800] text-white py-2 rounded-full text-sm font-medium hover:bg-[#3b7700] transition"
+          className="mt-2 sm:mt-4 w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium hover:shadow-lg transition-all duration-300"
         >
           Learn more
         </button>

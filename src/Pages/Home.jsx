@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TextPlugin } from "gsap/TextPlugin";
@@ -174,9 +175,9 @@ statsCardsRef.current.forEach((card) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
         {/* Content Container */}
-        <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-12 lg:px-16">
+        <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-6 sm:py-10">
           {/* Top badge */}
-          <div ref={heroSubtitleRef} className="mb-4">
+          <div ref={heroSubtitleRef}>
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white">
               <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z"/>
@@ -186,34 +187,30 @@ statsCardsRef.current.forEach((card) => {
             </span>
           </div>
 
-          {/* Main heading */}
-          <div ref={heroHeadingRef} className="max-w-2xl">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              Anuman Nadhi Fed
-            </h1>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-white/80 mt-2">
-              Farmer Producer Company Ltd
-            </h2>
-            <p className="text-sm sm:text-base text-white/60 mt-4 max-w-lg leading-relaxed hidden sm:block">
-              Empowering farmers through sustainable agriculture, natural farming practices, and direct market connections.
-            </p>
-          </div>
+          {/* Bottom content */}
+          <div>
+            {/* Main heading */}
+            <div ref={heroHeadingRef} className="max-w-2xl">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                Anuman Nadhi Fed
+              </h1>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium text-white/80 mt-2">
+                Farmer Producer Company Ltd
+              </h2>
+              <p className="text-sm sm:text-base text-white/60 mt-4 max-w-lg leading-relaxed hidden sm:block">
+                Empowering farmers through sustainable agriculture, natural farming practices, and direct market connections.
+              </p>
+            </div>
 
-          {/* CTA Buttons */}
-          <div ref={buttonRef} className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-            <button className="group flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm sm:text-base font-semibold py-3 px-6 sm:px-8 rounded-full shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all duration-300">
-              About Us
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
-            <button className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium py-3 px-6 rounded-full hover:bg-white/20 transition-all duration-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              Watch Story
-            </button>
+            {/* CTA Button */}
+            <div ref={buttonRef} className="mt-4 sm:mt-6">
+              <Link to="/about" className="group inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm sm:text-base font-semibold py-3 px-6 sm:px-8 rounded-full shadow-lg shadow-green-500/30 hover:shadow-green-500/50 transition-all duration-300">
+                About Us
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -233,10 +230,10 @@ statsCardsRef.current.forEach((card) => {
           ))}
         </div>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows - hidden on mobile */}
         <button
           onClick={() => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
+          className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
           aria-label="Previous slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +242,7 @@ statsCardsRef.current.forEach((card) => {
         </button>
         <button
           onClick={() => setCurrentSlide((prev) => (prev + 1) % heroImages.length)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
+          className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all duration-300 z-10"
           aria-label="Next slide"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +290,7 @@ statsCardsRef.current.forEach((card) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {[Rectangle34, Rectangle35, Rectangle36, Rectangle37].map((img, i) => (
             <StatisticsCard
               key={i}
@@ -301,17 +298,17 @@ statsCardsRef.current.forEach((card) => {
               imageSrc={img}
               number={[400, 10, 50, 22][i]}
               description={[
-                "Farmers empowered through natural farming",
-                "Outlets under ANFED MART",
-                "Soil tests conducted",
-                "Waterbodies revived in the Anuman Nathi basin",
+                "Farmers empowered",
+                "ANFED MART Outlets",
+                "Soil tests done",
+                "Waterbodies revived",
               ][i]}
               dataTarget={[400, 10, 50, 22][i]}
               buttonText={[
-                "Meet Our Farmers",
-                "Visit ANFED Mart",
-                "View Services",
-                "See Gallery",
+                "Meet Farmers",
+                "Visit Mart",
+                "Services",
+                "Gallery",
               ][i]}
               linkTo={[
                 "/farmers",

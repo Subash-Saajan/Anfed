@@ -111,29 +111,29 @@ export default function CoreValues() {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {coreValues.map((value, index) => {
           const colors = colorVariants[value.color];
           return (
             <div
               key={index}
-              className={`group relative p-5 rounded-2xl ${colors.bg} border ${colors.border} hover:shadow-xl transition-all duration-500 hover:-translate-y-1`}
+              className={`group relative p-3 sm:p-5 rounded-2xl ${colors.bg} border ${colors.border} hover:shadow-xl transition-all duration-500 hover:-translate-y-1`}
             >
               {/* Icon */}
-              <div className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl ${colors.iconBg} flex items-center justify-center text-white mb-2 sm:mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 [&>svg]:w-5 [&>svg]:h-5 sm:[&>svg]:w-7 sm:[&>svg]:h-7`}>
                 {value.icon}
               </div>
 
               {/* Content */}
-              <h4 className="text-base font-bold text-gray-800 mb-2">
+              <h4 className="text-xs sm:text-base font-bold text-gray-800 mb-1 sm:mb-2 leading-tight">
                 {value.title}
               </h4>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-xs text-gray-600 leading-relaxed hidden sm:block">
                 {value.description}
               </p>
 
               {/* Decorative corner accent */}
-              <div className={`absolute bottom-0 right-0 w-16 h-16 ${colors.accent} opacity-5 rounded-tl-full`}></div>
+              <div className={`absolute bottom-0 right-0 w-12 sm:w-16 h-12 sm:h-16 ${colors.accent} opacity-5 rounded-tl-full`}></div>
             </div>
           );
         })}

@@ -84,7 +84,7 @@ const OverviewCards = ({ addRef }) => {
   const cardsRef = useRef([]);
 
   return (
-    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       {overviewData.map((item, index) => (
         <div
           key={index}
@@ -98,19 +98,19 @@ const OverviewCards = ({ addRef }) => {
           <div className={`h-1.5 w-full bg-gradient-to-r ${item.gradient}`}></div>
 
           {/* Card content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Icon container */}
-            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+            <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center text-white mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg [&>svg]:w-5 [&>svg]:h-5 sm:[&>svg]:w-8 sm:[&>svg]:h-8`}>
               {item.icon}
             </div>
 
             {/* Title */}
-            <h4 className="text-lg font-bold text-gray-800 mb-3 group-hover:text-green-700 transition-colors duration-300">
+            <h4 className="text-sm sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3 group-hover:text-green-700 transition-colors duration-300 leading-tight">
               {item.title}
             </h4>
 
             {/* Description */}
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed hidden sm:block">
               {item.description}
             </p>
           </div>
