@@ -10,8 +10,10 @@ import AdminBubble from "./components/AdminBubble";
 import About from "./Pages/About";
 import Footer from "./components/Footer";
 import Farmers from "./Pages/Farmers";
-import Event from "./Pages/Event"; // import the new Event page
-import Services from "./Pages/Services"; // added service page import
+import Event from "./Pages/Event";
+import Services from "./Pages/Services";
+import Mart from "./Pages/Mart";
+import Gallery from "./Pages/Gallery";
 import "./App.css";
 
 export default function App() {
@@ -26,6 +28,8 @@ export default function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/farmers" element={<Farmers />} />
+          <Route path="/mart" element={<Mart />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"

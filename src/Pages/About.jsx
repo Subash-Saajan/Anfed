@@ -191,11 +191,11 @@ export default function About() {
                 (p) => (p - 1 + teamMembers.length) % teamMembers.length
               )
             }
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow border border-slate-200 flex items-center justify-center text-slate-700"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white hover:bg-gray-50 shadow-lg border border-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
           >
             <svg
-              width="16"
-              height="16"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -207,11 +207,11 @@ export default function About() {
           <button
             aria-label="Next"
             onClick={() => setCurrentIndex((p) => (p + 1) % teamMembers.length)}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow border border-slate-200 flex items-center justify-center text-slate-700"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white hover:bg-gray-50 shadow-lg border border-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
           >
             <svg
-              width="16"
-              height="16"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -221,47 +221,72 @@ export default function About() {
             </svg>
           </button>
 
-          {teamMembers.map((m, i) => {
-            // Wrap-relative offset from currentIndex
-            let diff = i - currentIndex;
-            const n = teamMembers.length;
-            const half = Math.floor(n / 2);
-            if (diff > half) diff -= n;
-            if (diff < -half) diff += n;
-            const abs = Math.abs(diff);
-            // Wider spacing and curved arc
-            const spread = 220; // px spacing horizontally
-            const curve = 24; // px vertical per step
-            const yOffset = abs * curve; // lower towards edges for an arc
-            const zIndex = 100 - abs; // center above
-            return (
-              <Motion.div
-                key={i}
-                initial={{ scale: 0.9, opacity: 0, x: 0, y: 0 }}
-                animate={{
-                  scale: 1 - abs * 0.08,
-                  opacity: 1 - abs * 0.18,
-                  x: diff * spread,
-                  y: yOffset,
-                }}
-                transition={{ type: "spring", stiffness: 120, damping: 18 }}
-                className="absolute top-0"
-                style={{ zIndex }}
-              >
-                <div className="flex flex-col items-center">
-                  <img
-                    src={m.img}
-                    alt={m.name}
-                    className="w-40 h-56 sm:w-48 sm:h-64 md:w-56 md:h-72 object-cover rounded-3xl shadow-lg"
-                  />
-                  <div className="text-center mt-3">
-                    <p className="text-slate-900 font-semibold">{m.name}</p>
-                    <p className="text-[#448800] text-sm">{m.role}</p>
+          {/* Carousel container */}
+          <div className="relative w-full h-96 flex items-center justify-center">
+            {teamMembers.map((m, i) => {
+              // Wrap-relative offset from currentIndex
+              let diff = i - currentIndex;
+              const n = teamMembers.length;
+              const half = Math.floor(n / 2);
+              if (diff > half) diff -= n;
+              if (diff < -half) diff += n;
+              const abs = Math.abs(diff);
+              // Only show visible cards (within range)
+              if (abs > 2) return null;
+              // Wider spacing and curved arc
+              const spread = 200; // px spacing horizontally
+              const curve = 20; // px vertical per step
+              const yOffset = abs * curve; // lower towards edges for an arc
+              const zIndex = 100 - abs; // center above
+              const scale = 1 - abs * 0.12;
+              const opacity = 1 - abs * 0.25;
+              return (
+                <Motion.div
+                  key={m.name}
+                  initial={false}
+                  animate={{
+                    scale: scale,
+                    opacity: opacity,
+                    x: diff * spread,
+                    y: yOffset,
+                  }}
+                  transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                  className="absolute"
+                  style={{ zIndex }}
+                >
+                  <div className="flex flex-col items-center">
+                    <div className="bg-white rounded-3xl shadow-xl p-2 overflow-hidden">
+                      <img
+                        src={m.img}
+                        alt={m.name}
+                        className="w-36 h-48 sm:w-44 sm:h-56 md:w-48 md:h-64 object-cover rounded-2xl"
+                      />
+                    </div>
+                    <div className="text-center mt-3">
+                      <p className="text-slate-900 font-semibold">{m.name}</p>
+                      <p className="text-[#448800] text-sm">{m.role}</p>
+                    </div>
                   </div>
-                </div>
-              </Motion.div>
-            );
-          })}
+                </Motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Carousel dots */}
+        <div className="flex justify-center gap-2 mt-4">
+          {teamMembers.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === currentIndex
+                  ? "bg-green-600 w-6"
+                  : "bg-gray-300 hover:bg-gray-400"
+              }`}
+              aria-label={`Go to team member ${i + 1}`}
+            />
+          ))}
         </div>
       </section>
     </main>
