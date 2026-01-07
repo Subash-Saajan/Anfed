@@ -1,5 +1,19 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { FARMERS } from "../data/farmersData";
+import {
+  parseFarmerExcelData,
+  getUniqueValues,
+  filterData,
+  aggregateData,
+} from "../utils/excelParser";
+import {
+  FarmerBarChart,
+  FarmerPieChart,
+  FarmerLineChart,
+  StatisticsCards,
+} from "../components/FarmerCharts";
+import { DataFilters } from "../components/DataFilters";
 // Always-on viewport filtering version.
 
 export default function Farmers() {
@@ -16,6 +30,40 @@ export default function Farmers() {
   const [showViewportOnly, setShowViewportOnly] = useState(true);
   // (Progress state removed – all data static.)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // used only for static map fallback (optional)
+
+  // Excel data and filters (rendered above map area)
+  const [excelData, setExcelData] = useState([]);
+  const [dataFilters, setDataFilters] = useState({
+    village: "",
+    hamlet: "",
+    product: "",
+  });
+  const [filterOptions, setFilterOptions] = useState({
+    villages: [],
+    hamlets: [],
+    products: [],
+  });
+
+  useEffect(() => {
+    async function loadExcel() {
+      try {
+        const data = await parseFarmerExcelData(
+          "/farmer website detail-1.xlsx"
+        );
+        setExcelData(data || []);
+        setFilterOptions({
+          villages: getUniqueValues(data, "village"),
+          hamlets: getUniqueValues(data, "hamlet"),
+          products: getUniqueValues(data, "product"),
+        });
+      } catch (err) {
+        console.error("Failed to load excel data", err);
+      }
+    }
+    loadExcel();
+  }, []);
+
+  const filteredExcelData = filterData(excelData, dataFilters);
 
   // Helper to create stable slug for DOM data attributes
   const slugify = useCallback(
@@ -290,10 +338,34 @@ export default function Farmers() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 farmers-page">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-          Farmers Directory
-        </h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+            Farmers Directory
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Browse farmer locations and details on the map
+          </p>
+        </div>
+        <Link
+          to="/farmers-analytics"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          Analytics
+        </Link>
       </div>
 
       {/* Split Layout Container */}
@@ -433,12 +505,47 @@ export default function Farmers() {
           </div>
         </div>
 
-        {/* Right Half - Map */}
-        <div className="w-1/2">
-          <div
-            ref={mapRef}
-            className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
-          />
+        {/* Right Half - Analytics + Map */}
+        <div className="w-1/2 flex flex-col gap-4">
+          {/* Analytics area (filters, stats, charts) shown above the map */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm max-h-[40%] overflow-y-auto">
+            <DataFilters
+              filters={dataFilters}
+              onFilterChange={setDataFilters}
+              options={filterOptions}
+            />
+
+            <StatisticsCards data={filteredExcelData} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="p-2 bg-white">
+                <FarmerBarChart
+                  data={aggregateData(filteredExcelData, "village")}
+                  title="Farmers by Village"
+                />
+              </div>
+              <div className="p-2 bg-white">
+                <FarmerPieChart
+                  data={aggregateData(filteredExcelData, "product")}
+                  title="Product Distribution"
+                />
+              </div>
+              <div className="p-2 bg-white md:col-span-2">
+                <FarmerLineChart
+                  data={aggregateData(filteredExcelData, "hamlet")}
+                  title="Farmers by Hamlet"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Map area */}
+          <div className="flex-1 min-h-0">
+            <div
+              ref={mapRef}
+              className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
+            />
+          </div>
         </div>
       </div>
       {/* Hide default Google Maps InfoWindow close X for a cleaner look */}
