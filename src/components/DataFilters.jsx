@@ -23,7 +23,7 @@ export function DataFilters({ filters, onFilterChange, options }) {
         )}
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Village Filter */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-slate-700 mb-2">
@@ -63,7 +63,7 @@ export function DataFilters({ filters, onFilterChange, options }) {
         </div>
 
         {/* Product Filter */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <label className="text-sm font-medium text-slate-700 mb-2">
             Product
           </label>
@@ -79,7 +79,7 @@ export function DataFilters({ filters, onFilterChange, options }) {
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Active Filters Display */}

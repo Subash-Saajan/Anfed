@@ -81,7 +81,7 @@ export function FarmerBarChart({ data, dataKey = 'value', nameKey = 'name', titl
  */
 export function FarmerPieChart({ data, dataKey = 'value', nameKey = 'name', title,
   showPercent = true,
-  showValue = false }) {
+  showValue = true }) {
   if (!data || data.length === 0) {
     return <div className="text-center text-slate-500 py-8">No data available</div>;
   }
@@ -251,7 +251,11 @@ export function FarmerLineChart({ data, dataKey = 'value', nameKey = 'name', tit
  * Statistics Cards Component
  */
 export function StatisticsCards({ data, cropCount }) {
-  const totalFarmers = data?.length || 0;
+  // const totalFarmers = data?.length || 0;
+  const totalFarmers = data.reduce(
+    (sum, row) => sum + Number(row["Total Number of farmer"] || 0),
+    0
+  );
   const uniqueVillages = new Set(data.map(d => d["Village Name"])).size;
 const uniqueHamlets = new Set(data.map(d => d["Hamlet Name"])).size;
 const uniqueProducts = cropCount ?? 0;
@@ -267,7 +271,7 @@ const uniqueProducts = cropCount ?? 0;
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="flex flex-col gap-4">
       {stats.map((stat, index) => (
         <div
           key={index}

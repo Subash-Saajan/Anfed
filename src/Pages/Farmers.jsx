@@ -50,6 +50,8 @@ export default function Farmers() {
     crops: [],
   });
 
+  const cropList = ["ALL", ...CROP_COLUMNS];
+
   useEffect(() => {
     async function loadExcel() {
       try {
@@ -60,7 +62,7 @@ export default function Farmers() {
         setFilterOptions({
           villages: [...new Set(data.map(d => d["Village Name"]))],
           hamlets: [...new Set(data.map(d => d["Hamlet Name"]))],
-          crops: CROP_COLUMNS,
+          crops: cropList,
         });
                
         // setFilterOptions({
@@ -107,7 +109,7 @@ export default function Farmers() {
     }, {})
   );
 
-  const cropPieData = CROP_COLUMNS.map((crop) => {
+  const cropPieData = cropList.map((crop) => {
     const byHamlet = Object.values(
       excelData.reduce((acc, row) => {
         const hamlet = row["Hamlet Name"];
@@ -171,7 +173,7 @@ console.log("Crop Pie Example:", cropPieData[0]);
 // console.log("Hamlet plot:", hamletsPerVillage);
 
   const filteredExcelData = filterData(excelData, dataFilters);
-  // console.log("Analytics data:", filteredExcelData);
+  console.log("Analytics data:", filteredExcelData);
 
   // Helper to create stable slug for DOM data attributes
   const slugify = useCallback(
@@ -197,22 +199,31 @@ console.log("Crop Pie Example:", cropPieData[0]);
   //   if (dataFilters.village && row["Village Name"] !== dataFilters.village)
   //     return false;
   //   return true;
+  const filteredCropPieData =
+  dataFilters.crop && dataFilters.crop !== "ALL"
+    ? Object.values(
+        filteredRows.reduce((acc, row) => {
+          const key = row["Hamlet Name"]; // or Village Name if you prefer
 
-  const filteredCropPieData = dataFilters.crop
-  ? [{
-      name: dataFilters.crop,
-      value: filteredRows.reduce(
-        (sum, row) => sum + Number(row[dataFilters.crop] || 0),
-        0
+          const value = Number(row[dataFilters.crop] || 0);
+
+          if (value > 0) {
+            if (!acc[key]) acc[key] = { name: key, value: 0 };
+            acc[key].value += value;
+          }
+
+          return acc;
+        }, {})
       )
-    }]
-  : CROP_COLUMNS.map(crop => ({
-      name: crop,
-      value: filteredRows.reduce(
-        (sum, row) => sum + Number(row[crop] || 0),
-        0
-      )
-    })).filter(item => item.value > 0);
+    : CROP_COLUMNS.map((crop) => ({
+        name: crop,
+        value: filteredRows.reduce(
+          (sum, row) => sum + Number(row[crop] || 0),
+          0
+        ),
+      })).filter((i) => i.value > 0);
+
+  
 
 
   // });
@@ -536,27 +547,31 @@ console.log("Crop Pie Example:", cropPieData[0]);
             Visualize and analyze farmer data by village, hamlet, and product
           </p>
         </div>
-<FarmersAnalyticsSection
-excelData={excelData}
+        <FarmersAnalyticsSection
+  dataFilters={dataFilters}
+  setDataFilters={setDataFilters}
+  filterOptions={filterOptions}
+  filteredCropPieData={filteredCropPieData}
+  excelData={excelData}
   farmersByHamlet={farmersByHamlet}
   farmersByVillage={farmersByVillage}
-  cropPieData={cropPieData}
 />
+
 
   
       {/* 2️⃣ FILTERS — FULL WIDTH */}
-      <div className="my-6">
+      {/* <div className="my-6">
         <DataFilters
           filters={dataFilters}
           onFilterChange={setDataFilters}
           options={filterOptions}
         />
-        {/* <StatisticsCards data={filteredExcelData} cropCount={CROP_COLUMNS.length}/> */}
+        <StatisticsCards data={filteredExcelData} cropCount={CROP_COLUMNS.length}/>
 
-      </div>
+      </div> */}
 
 
-{(dataFilters.hamlet || dataFilters.village || dataFilters.crop) && (
+{/* {(dataFilters.hamlet || dataFilters.village || dataFilters.crop) && (
   <div className="flex gap-6 items-start">
 
     <div className="w-2/3">
@@ -590,7 +605,7 @@ excelData={excelData}
     </div>
 
   </div>
-)}
+)} */}
 
       {/* {(dataFilters.hamlet || dataFilters.village) ? (
   <FarmerPieChart
@@ -604,7 +619,7 @@ excelData={excelData}
 ) : (
   <CropPieCarousel cropPieData={cropPieData} />
 )} */}
-
+<br></br>
       <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
             Farmers Directory
