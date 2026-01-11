@@ -1,0 +1,109 @@
+      {/* LEFT: Crop List */}
+      {/* <div className="w-1/4 border-r pr-4">
+        <h3 className="font-semibold mb-3">Crops</h3>
+        <ul className="space-y-2">
+          {cropPieData.map((item, index) => (
+            <li
+              key={item.crop}
+              onClick={() => goToCrop(index)}
+              className={`cursor-pointer text-sm px-2 py-1 rounded
+                ${
+                  index === currentIndex
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "hover:bg-slate-100 text-slate-700"
+                }`}
+            >
+              {item.crop}
+            </li>
+          ))}
+        </ul>
+      </div> */}
+        {/* <div className="space-y-4"> */}
+        <div className="flex flex-col items-center gap-6">
+
+  {/* Crop bubbles */}
+  <div className="flex flex-wrap gap-2 justify-center">
+    {cropPieData.map((item, index) => (
+      <button
+        key={item.crop}
+        onClick={() => setCurrentIndex(index)}
+        className={`px-4 py-1 rounded-full text-sm border transition
+          ${
+            index === currentIndex
+              ? "bg-blue-600 text-white border-blue-600"
+              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+          }`}
+      >
+        {item.crop}
+      </button>
+    ))}
+  </div>
+
+      {/* RIGHT: Pie Chart + Controls */}
+      {/* <div className="w-3/4 flex flex-col items-center"> */}
+
+        {/* Header with arrows */}
+        {/* <div className="flex items-center gap-4 mb-2">
+          <button
+            onClick={goPrev}
+            className="px-3 py-1 rounded border hover:bg-slate-100"
+          >
+            ←
+          </button>
+
+          <h3 className="font-semibold text-lg">
+            {currentCrop.crop} Distribution
+          </h3>
+
+          <button
+            onClick={goNext}
+            className="px-3 py-1 rounded border hover:bg-slate-100"
+          >
+            →
+          </button>
+        </div> */}
+
+        {/* Pie Chart */}
+        {/* <div className="w-full">
+          <FarmerPieChart
+            title=""
+            data={currentCrop.data}
+          />
+        </div> */}
+        
+<div className="flex justify-center items-start gap-10 w-full max-w-4xl">
+
+{/* Pie Chart */}
+<div className="w-[320px] flex justify-center">
+  <FarmerPieChart
+    title=""
+    data={currentCrop.data}
+  />
+</div>
+
+{/* Static Legend */}
+<div className="min-w-[200px] text-sm">
+  <h4 className="font-semibold mb-3 text-center">Hamlets</h4>
+  <ul className="space-y-2">
+    {currentCrop.data.map((item, idx) => (
+      <li key={item.name} className="flex items-center gap-2">
+        <span
+          className="inline-block w-3 h-3 rounded-sm"
+          style={{
+            backgroundColor: `hsl(${idx * 45}, 70%, 55%)`,
+          }}
+        />
+        <span className="truncate">{item.name}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+</div>
+
+
+        {/* Indicator */}
+        <p className="text-xs text-slate-500 mt-2">
+          {currentIndex + 1} / {total}
+        </p>
+      </div>

@@ -1,0 +1,16 @@
+export const CROP_COLUMNS = [
+  "Coconut",
+  "Jasmine",
+  "Pitchi",
+  "Thaddai",
+  "Vegetable",
+  "Banana",
+  "Mango",
+  "Guava",
+  "Lemon",
+  "Amla",
+  "Paddy",
+  "Papaya",
+  "Athipazham",
+  "Kerenthi",
+];

@@ -15,7 +15,7 @@ export default function FarmersAnalytics() {
     async function loadExcelData() {
       try {
         setLoading(true);
-        const data = await parseFarmerExcelData('/farmer website detail-1.xlsx');
+        const data = await parseFarmerExcelData('public/farmer website detail-1.xlsx');
         setExcelData(data);
         
         // Extract unique values for filters
@@ -32,9 +32,11 @@ export default function FarmersAnalytics() {
     }
     loadExcelData();
   }, []);
-
   // Get filtered data based on selected filters
   const filteredExcelData = filterData(excelData, dataFilters);
+
+
+  
 
   if (loading) {
     return (
@@ -80,7 +82,7 @@ export default function FarmersAnalytics() {
         />
 
         {/* Statistics Cards */}
-        <StatisticsCards data={filteredExcelData} />
+        <StatisticsCards data={filteredExcelData}/>
 
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

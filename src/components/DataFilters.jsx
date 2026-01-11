@@ -4,15 +4,15 @@ import React from 'react';
  * Filter Component for data filtering
  */
 export function DataFilters({ filters, onFilterChange, options }) {
-  const { villages = [], hamlets = [], products = [] } = options;
+  const { villages = [], hamlets = [], crops = [] } = options;
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-slate-800">Filters</h3>
-        {(filters.village || filters.hamlet || filters.product) && (
+        {(filters.village || filters.hamlet || filters.crop) && (
           <button
-            onClick={() => onFilterChange({ village: '', hamlet: '', product: '' })}
+            onClick={() => onFilterChange({ village: '', hamlet: '', crop: '' })}
             className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,14 +68,14 @@ export function DataFilters({ filters, onFilterChange, options }) {
             Product
           </label>
           <select
-            value={filters.product || ''}
-            onChange={(e) => onFilterChange({ ...filters, product: e.target.value })}
+            value={filters.crop || ''}
+            onChange={(e) => onFilterChange({ ...filters, crop: e.target.value })}
             className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-slate-900"
           >
             <option value="">All Products</option>
-            {products.map((product, index) => (
-              <option key={index} value={product}>
-                {product}
+            {crops.map((crop, index) => (
+              <option key={index} value={crop}>
+                {crop}
               </option>
             ))}
           </select>
@@ -83,7 +83,7 @@ export function DataFilters({ filters, onFilterChange, options }) {
       </div>
 
       {/* Active Filters Display */}
-      {(filters.village || filters.hamlet || filters.product) && (
+      {(filters.village || filters.hamlet || filters.crop) && (
         <div className="mt-4 flex flex-wrap gap-2">
           {filters.village && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
@@ -111,11 +111,11 @@ export function DataFilters({ filters, onFilterChange, options }) {
               </button>
             </span>
           )}
-          {filters.product && (
+          {filters.crop && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm">
-              Product: {filters.product}
+              Product: {filters.crop}
               <button
-                onClick={() => onFilterChange({ ...filters, product: '' })}
+                onClick={() => onFilterChange({ ...filters, crop: '' })}
                 className="hover:bg-amber-200 rounded-full p-0.5"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

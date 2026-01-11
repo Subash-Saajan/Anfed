@@ -15,12 +15,27 @@ import {
   Cell,
 } from 'recharts';
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+export const COLORS = [
+  "#3b82f6", // blue
+  "#10b981", // green
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#8b5cf6", // violet
+  "#ec4899", // pink
+  "#14b8a6", // teal
+  "#f97316", // orange
+  "#22c55e", // emerald
+  "#0ea5e9", // sky
+  "#a855f7", // purple
+  "#eab308", // yellow
+  "#06b6d4", // cyan
+  "#dc2626", // dark red
+];
 
 /**
  * Bar Chart Component
  */
-export function FarmerBarChart({ data, dataKey = 'count', nameKey = 'name', title }) {
+export function FarmerBarChart({ data, dataKey = 'value', nameKey = 'name', title }) {
   if (!data || data.length === 0) {
     return <div className="text-center text-slate-500 py-8">No data available</div>;
   }
@@ -30,6 +45,12 @@ export function FarmerBarChart({ data, dataKey = 'count', nameKey = 'name', titl
       {title && <h3 className="text-lg font-semibold text-slate-800 mb-4 text-center">{title}</h3>}
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <defs>
+      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#22c55e" />
+        <stop offset="100%" stopColor="#059669" />
+      </linearGradient>
+    </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis 
             dataKey={nameKey} 
@@ -48,7 +69,7 @@ export function FarmerBarChart({ data, dataKey = 'count', nameKey = 'name', titl
             }}
           />
           <Legend />
-          <Bar dataKey={dataKey} fill="#3b82f6" radius={[8, 8, 0, 0]} name="Count" />
+          <Bar dataKey={dataKey} fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Count" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -58,31 +79,81 @@ export function FarmerBarChart({ data, dataKey = 'count', nameKey = 'name', titl
 /**
  * Pie Chart Component
  */
-export function FarmerPieChart({ data, dataKey = 'value', nameKey = 'name', title }) {
+export function FarmerPieChart({ data, dataKey = 'value', nameKey = 'name', title,
+  showPercent = true,
+  showValue = false }) {
   if (!data || data.length === 0) {
     return <div className="text-center text-slate-500 py-8">No data available</div>;
   }
 
-  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  // const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  //   const RADIAN = Math.PI / 180;
+  //   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  //   const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  //   const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  //   return (
+  //     <text
+  //       x={x}
+  //       y={y}
+  //       fill="white"
+  //       textAnchor={x > cx ? 'start' : 'end'}
+  //       dominantBaseline="central"
+  //       fontSize={12}
+  //       fontWeight="600"
+  //     >
+  //       {`${(percent * 100).toFixed(0)}%`}
+  //     </text>
+  //   );
+  // };
+
+  //2nd
+  // const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  //   const RADIAN = Math.PI / 180;
+  //   const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
+  //   const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  //   const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  
+  //   return (
+  //     <text
+  //       x={x}
+  //       y={y}
+  //       fill="white"
+  //       textAnchor="middle"
+  //       dominantBaseline="central"
+  //       fontSize={12}
+  //       fontWeight="600"
+  //     >
+  //       {`${(percent * 100).toFixed(0)}%`}
+  //     </text>
+  //   );
+  // };
+  const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
+  
+    let text = "";
+    if (showValue) text = value;
+    else if (showPercent) text = `${(percent * 100).toFixed(0)}%`;
+  
     return (
       <text
         x={x}
         y={y}
         fill="white"
-        textAnchor={x > cx ? 'start' : 'end'}
+        textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
         fontSize={12}
         fontWeight="600"
       >
-        {`${(percent * 100).toFixed(0)}%`}
+        {text}
       </text>
     );
   };
+  
+  
 
   return (
     <div className="w-full">
@@ -112,11 +183,11 @@ export function FarmerPieChart({ data, dataKey = 'value', nameKey = 'name', titl
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
             }}
           />
-          <Legend 
+          {/* <Legend 
             verticalAlign="bottom" 
             height={36}
             wrapperStyle={{ fontSize: '12px' }}
-          />
+          /> */}
         </PieChart>
       </ResponsiveContainer>
     </div>
@@ -126,7 +197,7 @@ export function FarmerPieChart({ data, dataKey = 'value', nameKey = 'name', titl
 /**
  * Line Chart Component
  */
-export function FarmerLineChart({ data, dataKey = 'count', nameKey = 'name', title }) {
+export function FarmerLineChart({ data, dataKey = 'value', nameKey = 'name', title }) {
   if (!data || data.length === 0) {
     return <div className="text-center text-slate-500 py-8">No data available</div>;
   }
@@ -136,6 +207,13 @@ export function FarmerLineChart({ data, dataKey = 'count', nameKey = 'name', tit
       {title && <h3 className="text-lg font-semibold text-slate-800 mb-4 text-center">{title}</h3>}
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <defs>
+      <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#22c55e" />
+        <stop offset="100%" stopColor="#059669" />
+      </linearGradient>
+    </defs>
+
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis 
             dataKey={nameKey} 
@@ -157,9 +235,9 @@ export function FarmerLineChart({ data, dataKey = 'count', nameKey = 'name', tit
           <Line 
             type="monotone" 
             dataKey={dataKey} 
-            stroke="#3b82f6" 
-            strokeWidth={2}
-            dot={{ fill: '#3b82f6', r: 4 }}
+            stroke="url(#lineGradient)"
+            strokeWidth={3}
+            dot={{ fill: "#22c55e", r: 4 }}
             activeDot={{ r: 6 }}
             name="Count"
           />
@@ -172,11 +250,14 @@ export function FarmerLineChart({ data, dataKey = 'count', nameKey = 'name', tit
 /**
  * Statistics Cards Component
  */
-export function StatisticsCards({ data }) {
+export function StatisticsCards({ data, cropCount }) {
   const totalFarmers = data?.length || 0;
-  const uniqueVillages = [...new Set(data?.map(d => d.village))].filter(Boolean).length;
-  const uniqueHamlets = [...new Set(data?.map(d => d.hamlet))].filter(Boolean).length;
-  const uniqueProducts = [...new Set(data?.map(d => d.product))].filter(Boolean).length;
+  const uniqueVillages = new Set(data.map(d => d["Village Name"])).size;
+const uniqueHamlets = new Set(data.map(d => d["Hamlet Name"])).size;
+const uniqueProducts = cropCount ?? 0;
+  // const uniqueVillages = [...new Set(data?.map(d => d.village))].filter(Boolean).length;
+  // const uniqueHamlets = [...new Set(data?.map(d => d.hamlet))].filter(Boolean).length;
+  // const uniqueProducts = [...new Set(data?.map(d => d.product))].filter(Boolean).length;
 
   const stats = [
     { label: 'Total Farmers', value: totalFarmers, icon: '👨‍🌾', color: 'bg-blue-500' },

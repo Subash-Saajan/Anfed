@@ -5,24 +5,25 @@ import * as XLSX from 'xlsx';
  * @param {string} filePath - Path to the Excel file
  * @returns {Promise<Array>} - Parsed farmer data
  */
-export async function parseFarmerExcelData(filePath) {
-  try {
-    const response = await fetch(filePath);
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    
-    // Get the first sheet
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    
-    // Convert to JSON
-    const data = XLSX.utils.sheet_to_json(worksheet);
-    
-    return data;
-  } catch (error) {
-    console.error('Error parsing Excel file:', error);
-    return [];
+export async function parseFarmerExcelData(path) {
+  console.log("Fetching Excel:", path);
+
+  const response = await fetch(path);
+  console.log("Fetch response:", response);
+
+  if (!response.ok) {
+    throw new Error("Excel file not found");
   }
+
+  const buffer = await response.arrayBuffer();
+  console.log("Excel buffer size:", buffer.byteLength);
+
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const sheet = workbook.Sheets[workbook.SheetNames[1]];
+  const data = XLSX.utils.sheet_to_json(sheet);
+  console.log("Using sheet:", workbook.SheetNames[1]);
+  console.log("Parsed Excel rows:", data.length);
+  return data;
 }
 
 /**

@@ -15,6 +15,12 @@ import {
 } from "../components/FarmerCharts";
 import { DataFilters } from "../components/DataFilters";
 // Always-on viewport filtering version.
+import FarmersAnalyticsSection from '../components/FarmersAnalyticsSection';
+import { Crop } from "lucide-react";
+import { COLORS } from "../components/FarmerCharts";
+import { CROP_COLUMNS } from "../constants/crops";
+import CropPieCarousel from "../components/CropPieCarousel";
+
 
 export default function Farmers() {
   const mapRef = useRef(null);
@@ -36,34 +42,136 @@ export default function Farmers() {
   const [dataFilters, setDataFilters] = useState({
     village: "",
     hamlet: "",
-    product: "",
+    crop: "",
   });
   const [filterOptions, setFilterOptions] = useState({
     villages: [],
     hamlets: [],
-    products: [],
+    crops: [],
   });
 
   useEffect(() => {
     async function loadExcel() {
       try {
         const data = await parseFarmerExcelData(
-          "/farmer website detail-1.xlsx"
+          "/farmer_website_detail.xlsx"
         );
         setExcelData(data || []);
         setFilterOptions({
-          villages: getUniqueValues(data, "village"),
-          hamlets: getUniqueValues(data, "hamlet"),
-          products: getUniqueValues(data, "product"),
+          villages: [...new Set(data.map(d => d["Village Name"]))],
+          hamlets: [...new Set(data.map(d => d["Hamlet Name"]))],
+          crops: CROP_COLUMNS,
         });
+               
+        // setFilterOptions({
+        //   villages: getUniqueValues(data, "village"),
+        //   hamlets: getUniqueValues(data, "hamlet"),
+        //   products: getUniqueValues(data, "product"),
+        // });
       } catch (err) {
         console.error("Failed to load excel data", err);
       }
     }
     loadExcel();
   }, []);
+  useEffect(() => {
+    console.log("Excel data loaded:", excelData);
+    console.log("First row:", excelData[0]);
+  }, [excelData]);
+
+  const farmersByHamlet = Object.values(
+    excelData.reduce((acc, row) => {
+      const hamlet = row["Hamlet Name"];
+      const farmers = Number(row["Total Number of farmer"] || 0);
+  
+      if (!acc[hamlet]) {
+        acc[hamlet] = { name: hamlet, value: 0 };
+      }
+  
+      acc[hamlet].value += farmers;
+      return acc;
+    }, {})
+  );
+
+  const farmersByVillage = Object.values(
+    excelData.reduce((acc, row) => {
+      const village = row["Village Name"];
+      const farmers = Number(row["Total Number of farmer"] || 0);
+  
+      if (!acc[village]) {
+        acc[village] = { name: village, value: 0 };
+      }
+  
+      acc[village].value += farmers;
+      return acc;
+    }, {})
+  );
+
+  const cropPieData = CROP_COLUMNS.map((crop) => {
+    const byHamlet = Object.values(
+      excelData.reduce((acc, row) => {
+        const hamlet = row["Hamlet Name"];
+        const value = Number(row[crop] || 0);
+  
+        if (value > 0) {
+          if (!acc[hamlet]) {
+            acc[hamlet] = { name: hamlet, value: 0 };
+          }
+          acc[hamlet].value += value;
+        }
+        return acc;
+      }, {})
+    );
+  
+    return {
+      crop,
+      data: byHamlet,
+    };
+  });
+  
+  console.log("Farmers by Hamlet:", farmersByHamlet);
+console.log("Farmers by Village:", farmersByVillage);
+console.log("Crop Pie Example:", cropPieData[0]);
+
+  // =======================
+// ANALYTICS DATA
+// =======================
+
+// // Crop-wise plots (one plot per crop)
+// const cropWisePlotData = CROP_COLUMNS.map((crop) => ({
+//   crop,
+//   data: excelData.map((row) => ({
+//     name: row["Village Name"],
+//     value: Number(row[crop] || 0),
+//   })),
+// }));
+
+// // Number of hamlets per village
+// const hamletsPerVillage = Object.values(
+//   excelData.reduce((acc, row) => {
+//     const village = row["Village Name"];
+//     const hamlet = row["Hamlet Name"];
+
+//     if (!acc[village]) {
+//       acc[village] = {
+//         village,
+//         hamlets: new Set(),
+//       };
+//     }
+
+//     acc[village].hamlets.add(hamlet);
+//     return acc;
+//   }, {})
+// ).map((v) => ({
+//   name: v.village,
+//   value: v.hamlets.size,
+// }));
+// console.log("Crop plots:", cropWisePlotData.length);
+// console.log("First crop data:", cropWisePlotData[0]);
+// console.log("Hamlet plot:", hamletsPerVillage);
 
   const filteredExcelData = filterData(excelData, dataFilters);
+  // console.log("Analytics data:", filteredExcelData);
 
   // Helper to create stable slug for DOM data attributes
   const slugify = useCallback(
@@ -75,6 +183,59 @@ export default function Farmers() {
         .replace(/^-+|-+$/g, ""),
     []
   );
+
+  const filteredRows = excelData.filter(row => {
+    if (dataFilters.hamlet && row["Hamlet Name"] !== dataFilters.hamlet) return false;
+    if (dataFilters.village && row["Village Name"] !== dataFilters.village) return false;
+    return true;
+  });
+  
+  
+  // const filteredRows = excelData.filter(row => {
+  //   if (dataFilters.hamlet && row["Hamlet Name"] !== dataFilters.hamlet)
+  //     return false;
+  //   if (dataFilters.village && row["Village Name"] !== dataFilters.village)
+  //     return false;
+  //   return true;
+
+  const filteredCropPieData = dataFilters.crop
+  ? [{
+      name: dataFilters.crop,
+      value: filteredRows.reduce(
+        (sum, row) => sum + Number(row[dataFilters.crop] || 0),
+        0
+      )
+    }]
+  : CROP_COLUMNS.map(crop => ({
+      name: crop,
+      value: filteredRows.reduce(
+        (sum, row) => sum + Number(row[crop] || 0),
+        0
+      )
+    })).filter(item => item.value > 0);
+
+
+  // });
+  //2nd
+  // const filteredCropPieData = CROP_COLUMNS
+  // .filter(crop => !dataFilters.crop || crop === dataFilters.crop)
+  // .map(crop => ({
+  //   name: crop,
+  //   value: filteredRows.reduce(
+  //     (sum, row) => sum + Number(row[crop] || 0),
+  //     0
+  //   )
+  // }))
+  // .filter(item => item.value > 0);
+
+  // const filteredCropPieData = CROP_COLUMNS.map(crop => ({
+  //   name: crop,
+  //   value: filteredRows.reduce(
+  //     (sum, row) => sum + Number(row[crop] || 0),
+  //     0
+  //   )
+  // })).filter(item => item.value > 0);
+  
 
   const scrollToFarmer = useCallback(
     (farmer) => {
@@ -338,16 +499,11 @@ export default function Farmers() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 farmers-page">
+      {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-            Farmers Directory
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Browse farmer locations and details on the map
-          </p>
-        </div>
-        <Link
+        
+  
+        {/* <Link
           to="/farmers-analytics"
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -365,10 +521,99 @@ export default function Farmers() {
             />
           </svg>
           Analytics
-        </Link>
+        </Link> */}
+      </div>
+  
+      {/* <FarmersAnalyticsSection
+  cropWisePlotData={cropWisePlotData}
+  hamletsPerVillage={hamletsPerVillage}
+/> */}
+<div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+            Farmers Analytics Dashboard
+          </h1>
+          <p className="text-slate-600 mt-2">
+            Visualize and analyze farmer data by village, hamlet, and product
+          </p>
+        </div>
+<FarmersAnalyticsSection
+excelData={excelData}
+  farmersByHamlet={farmersByHamlet}
+  farmersByVillage={farmersByVillage}
+  cropPieData={cropPieData}
+/>
+
+  
+      {/* 2️⃣ FILTERS — FULL WIDTH */}
+      <div className="my-6">
+        <DataFilters
+          filters={dataFilters}
+          onFilterChange={setDataFilters}
+          options={filterOptions}
+        />
+        {/* <StatisticsCards data={filteredExcelData} cropCount={CROP_COLUMNS.length}/> */}
+
       </div>
 
-      {/* Split Layout Container */}
+
+{(dataFilters.hamlet || dataFilters.village || dataFilters.crop) && (
+  <div className="flex gap-6 items-start">
+
+    <div className="w-2/3">
+      <FarmerPieChart
+        title={
+          dataFilters.crop
+            ? `${dataFilters.crop} Count`
+            : dataFilters.hamlet
+            ? `Crop Distribution in ${dataFilters.hamlet}`
+            : `Crop Distribution in ${dataFilters.village}`
+        }
+        data={filteredCropPieData}
+        showPercent={false}
+  showValue={true}
+      />
+    </div>
+
+    <div className="w-1/3 text-sm">
+      <h4 className="font-semibold mb-2">Legend</h4>
+      <ul className="space-y-1">
+        {filteredCropPieData.map((item, idx) => (
+          <li key={item.name} className="flex items-center gap-2">
+            <span
+              className="inline-block w-3 h-3 rounded-sm"
+              style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+            />
+            <span>{item.name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+  </div>
+)}
+
+      {/* {(dataFilters.hamlet || dataFilters.village) ? (
+  <FarmerPieChart
+    title={
+      dataFilters.hamlet
+        ? `Crop Distribution in ${dataFilters.hamlet} Hamlet`
+        : `Crop Distribution in ${dataFilters.village} Village`
+    }
+    data={filteredCropPieData}
+  />
+) : (
+  <CropPieCarousel cropPieData={cropPieData} />
+)} */}
+
+      <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+            Farmers Directory
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Browse farmer locations and details on the map
+          </p>
+        </div>
+      {/* 3️⃣ FARMERS DIRECTORY (LIST + MAP) */}
       <div className="flex gap-6 h-[75vh]">
         {/* Left Half - Search and Farmer Cards */}
         <div className="w-1/2 flex flex-col">
@@ -396,12 +641,14 @@ export default function Farmers() {
                 />
               </svg>
             </div>
+  
             <div className="flex justify-between items-center mt-1">
               <p className="text-sm text-slate-500">
                 {filteredFarmers.length}{" "}
                 {showViewportOnly ? "visible in view" : "matching"} of{" "}
                 {farmerData.length} farmers
               </p>
+  
               <label className="flex items-center gap-2 text-xs select-none cursor-pointer">
                 <input
                   type="checkbox"
@@ -421,8 +668,8 @@ export default function Farmers() {
               </label>
             </div>
           </div>
-
-          {/* Farmer Cards Container */}
+  
+          {/* Farmer Cards */}
           <div ref={listRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
             {filteredFarmers.length > 0 ? (
               filteredFarmers.map((farmer, index) => (
@@ -441,7 +688,6 @@ export default function Farmers() {
                   `}
                   onClick={() => {
                     setSelectedFarmer(farmer);
-                    // Center map on this farmer and briefly show name tooltip on the marker
                     if (window.centerOnFarmer) {
                       window.centerOnFarmer(farmer.name);
                     }
@@ -460,95 +706,25 @@ export default function Farmers() {
                   <p className="text-sm text-slate-600 leading-relaxed">
                     {farmer.address}
                   </p>
-                  <div className="mt-2 flex items-center text-xs text-slate-500">
-                    <svg
-                      className="h-3 w-3 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    Click to view on map {farmer.approximate && "(approx)"}
-                  </div>
                 </div>
               ))
             ) : (
               <div className="text-center py-8 text-slate-500">
-                <svg
-                  className="h-12 w-12 mx-auto mb-4 text-slate-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
                 <p>No farmers found matching your search.</p>
               </div>
             )}
           </div>
         </div>
-
-        {/* Right Half - Analytics + Map */}
-        <div className="w-1/2 flex flex-col gap-4">
-          {/* Analytics area (filters, stats, charts) shown above the map */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm max-h-[40%] overflow-y-auto">
-            <DataFilters
-              filters={dataFilters}
-              onFilterChange={setDataFilters}
-              options={filterOptions}
-            />
-
-            <StatisticsCards data={filteredExcelData} />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="p-2 bg-white">
-                <FarmerBarChart
-                  data={aggregateData(filteredExcelData, "village")}
-                  title="Farmers by Village"
-                />
-              </div>
-              <div className="p-2 bg-white">
-                <FarmerPieChart
-                  data={aggregateData(filteredExcelData, "product")}
-                  title="Product Distribution"
-                />
-              </div>
-              <div className="p-2 bg-white md:col-span-2">
-                <FarmerLineChart
-                  data={aggregateData(filteredExcelData, "hamlet")}
-                  title="Farmers by Hamlet"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Map area */}
-          <div className="flex-1 min-h-0">
-            <div
-              ref={mapRef}
-              className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
-            />
-          </div>
+  
+        {/* Right Half - MAP (aligned with list top) */}
+        <div className="w-1/2">
+          <div
+            ref={mapRef}
+            className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
+          />
         </div>
       </div>
-      {/* Hide default Google Maps InfoWindow close X for a cleaner look */}
+  
       <style>{`
         .farmers-page .gm-ui-hover-effect {
           display: none !important;
@@ -556,4 +732,233 @@ export default function Farmers() {
       `}</style>
     </section>
   );
+  
+//   return (
+//     <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 farmers-page">
+//       <div className="mb-6 flex items-center justify-between">
+//         {/* TOP ANALYTICS SECTION */}
+// <FarmersAnalyticsSection
+//   dataFilters={dataFilters}
+//   setDataFilters={setDataFilters}
+//   filterOptions={filterOptions}
+//   filteredExcelData={filteredExcelData}
+// />
+
+//         <div>
+//           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+//             Farmers Directory
+//           </h1>
+//           <p className="text-slate-600 mt-1">
+//             Browse farmer locations and details on the map
+//           </p>
+//         </div>
+//         <Link
+//           to="/farmers-analytics"
+//           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+//         >
+//           <svg
+//             className="w-5 h-5"
+//             fill="none"
+//             stroke="currentColor"
+//             viewBox="0 0 24 24"
+//           >
+//             <path
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//               strokeWidth={2}
+//               d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+//             />
+//           </svg>
+//           Analytics
+//         </Link>
+//       </div>
+
+//       {/* Split Layout Container */}
+//       <div className="flex gap-6 h-[75vh]">
+//         {/* Left Half - Search and Farmer Cards */}
+//         <div className="w-1/2 flex flex-col">
+//           {/* Search Bar */}
+//           <div className="mb-4">
+//             <div className="relative">
+//               <input
+//                 type="text"
+//                 placeholder="Search farmers by name or address..."
+//                 value={searchTerm}
+//                 onChange={(e) => setSearchTerm(e.target.value)}
+//                 className="w-full px-4 py-2 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+//               />
+//               <svg
+//                 className="absolute left-3 top-2.5 h-5 w-5 text-slate-400"
+//                 fill="none"
+//                 stroke="currentColor"
+//                 viewBox="0 0 24 24"
+//               >
+//                 <path
+//                   strokeLinecap="round"
+//                   strokeLinejoin="round"
+//                   strokeWidth={2}
+//                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+//                 />
+//               </svg>
+//             </div>
+//             <div className="flex justify-between items-center mt-1">
+//               <p className="text-sm text-slate-500">
+//                 {filteredFarmers.length}{" "}
+//                 {showViewportOnly ? "visible in view" : "matching"} of{" "}
+//                 {farmerData.length} farmers
+//               </p>
+//               <label className="flex items-center gap-2 text-xs select-none cursor-pointer">
+//                 <input
+//                   type="checkbox"
+//                   checked={showViewportOnly}
+//                   onChange={(e) => setShowViewportOnly(e.target.checked)}
+//                   className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+//                 />
+//                 <span
+//                   className={
+//                     showViewportOnly
+//                       ? "text-blue-600 font-medium"
+//                       : "text-slate-600"
+//                   }
+//                 >
+//                   Viewport filter {showViewportOnly ? "ON" : "OFF"}
+//                 </span>
+//               </label>
+//             </div>
+//           </div>
+
+//           {/* Farmer Cards Container */}
+//           <div ref={listRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
+//             {filteredFarmers.length > 0 ? (
+//               filteredFarmers.map((farmer, index) => (
+//                 <div
+//                   key={index}
+//                   data-farmer-id={slugify(farmer.name)}
+//                   className={`group rounded-xl border transition-all cursor-pointer 
+//                     p-3 md:p-4 bg-white hover:bg-slate-50 
+//                     ${
+//                       selectedFarmer?.name === farmer.name
+//                         ? "border-blue-500 ring-2 ring-blue-500/40 shadow-sm"
+//                         : hoveredFarmer === farmer.name
+//                         ? "border-blue-300 ring-1 ring-blue-300/60 shadow-sm"
+//                         : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+//                     }
+//                   `}
+//                   onClick={() => {
+//                     setSelectedFarmer(farmer);
+//                     // Center map on this farmer and briefly show name tooltip on the marker
+//                     if (window.centerOnFarmer) {
+//                       window.centerOnFarmer(farmer.name);
+//                     }
+//                     scrollToFarmer(farmer);
+//                   }}
+//                   onMouseEnter={() => setHoveredFarmer(farmer.name)}
+//                   onMouseLeave={() =>
+//                     setHoveredFarmer((prev) =>
+//                       prev === farmer.name ? null : prev
+//                     )
+//                   }
+//                 >
+//                   <h3 className="font-semibold text-slate-900 mb-2">
+//                     {farmer.name}
+//                   </h3>
+//                   <p className="text-sm text-slate-600 leading-relaxed">
+//                     {farmer.address}
+//                   </p>
+//                   <div className="mt-2 flex items-center text-xs text-slate-500">
+//                     <svg
+//                       className="h-3 w-3 mr-1"
+//                       fill="none"
+//                       stroke="currentColor"
+//                       viewBox="0 0 24 24"
+//                     >
+//                       <path
+//                         strokeLinecap="round"
+//                         strokeLinejoin="round"
+//                         strokeWidth={2}
+//                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+//                       />
+//                       <path
+//                         strokeLinecap="round"
+//                         strokeLinejoin="round"
+//                         strokeWidth={2}
+//                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+//                       />
+//                     </svg>
+//                     Click to view on map {farmer.approximate && "(approx)"}
+//                   </div>
+//                 </div>
+//               ))
+//             ) : (
+//               <div className="text-center py-8 text-slate-500">
+//                 <svg
+//                   className="h-12 w-12 mx-auto mb-4 text-slate-300"
+//                   fill="none"
+//                   stroke="currentColor"
+//                   viewBox="0 0 24 24"
+//                 >
+//                   <path
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                     strokeWidth={2}
+//                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+//                   />
+//                 </svg>
+//                 <p>No farmers found matching your search.</p>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* Right Half - Analytics + Map */}
+//         <div className="w-1/2 flex flex-col gap-4">
+//           {/* Analytics area (filters, stats, charts) shown above the map */}
+//           {/* <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm max-h-[40%] overflow-y-auto">
+//             <DataFilters
+//               filters={dataFilters}
+//               onFilterChange={setDataFilters}
+//               options={filterOptions}
+//             />
+
+//             <StatisticsCards data={filteredExcelData} />
+
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+//               <div className="p-2 bg-white">
+//                 <FarmerBarChart
+//                   data={aggregateData(filteredExcelData, "village")}
+//                   title="Farmers by Village"
+//                 />
+//               </div>
+//               <div className="p-2 bg-white">
+//                 <FarmerPieChart
+//                   data={aggregateData(filteredExcelData, "product")}
+//                   title="Product Distribution"
+//                 />
+//               </div>
+//               <div className="p-2 bg-white md:col-span-2">
+//                 <FarmerLineChart
+//                   data={aggregateData(filteredExcelData, "hamlet")}
+//                   title="Farmers by Hamlet"
+//                 />
+//               </div>
+//             </div>
+//           </div> */}
+
+//           {/* Map area */}
+//           <div className="flex-1 min-h-0">
+//             <div
+//               ref={mapRef}
+//               className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
+//             />
+//           </div>
+//         </div>
+//       </div>
+//       {/* Hide default Google Maps InfoWindow close X for a cleaner look */}
+//       <style>{`
+//         .farmers-page .gm-ui-hover-effect {
+//           display: none !important;
+//         }
+//       `}</style>
+//     </section>
+//   );
 }
