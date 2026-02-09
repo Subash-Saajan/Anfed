@@ -88,7 +88,7 @@ export default function Farmers() {
 
       acc[hamlet].value += farmers;
       return acc;
-    }, {})
+    }, {}),
   );
 
   const farmersByVillage = Object.values(
@@ -102,7 +102,7 @@ export default function Farmers() {
 
       acc[village].value += farmers;
       return acc;
-    }, {})
+    }, {}),
   );
 
   const cropPieData = cropList.map((crop) => {
@@ -118,7 +118,7 @@ export default function Farmers() {
           acc[hamlet].value += value;
         }
         return acc;
-      }, {})
+      }, {}),
     );
 
     return {
@@ -179,8 +179,21 @@ export default function Farmers() {
         .trim()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, ""),
-    []
+    [],
   );
+
+  const getVillage = useCallback((f) => {
+    if (!f || !f.address) return "";
+    const parts = f.address
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    // prefer the last segment that doesn't contain a numeric pincode
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (!/\d/.test(parts[i])) return parts[i];
+    }
+    return parts[0] || "";
+  }, []);
 
   const filteredRows = excelData.filter((row) => {
     if (dataFilters.hamlet && row["Hamlet Name"] !== dataFilters.hamlet)
@@ -210,13 +223,13 @@ export default function Farmers() {
             }
 
             return acc;
-          }, {})
+          }, {}),
         )
       : CROP_COLUMNS.map((crop) => ({
           name: crop,
           value: filteredRows.reduce(
             (sum, row) => sum + Number(row[crop] || 0),
-            0
+            0,
           ),
         })).filter((i) => i.value > 0);
 
@@ -252,7 +265,7 @@ export default function Farmers() {
         setTimeout(() => el.classList.remove("ring-2", "ring-blue-400"), 1200);
       }
     },
-    [slugify]
+    [slugify],
   );
 
   // Scroll a card into view only if outside the visible portion of the list container
@@ -275,7 +288,7 @@ export default function Farmers() {
         setTimeout(() => el.classList.remove("ring-2", "ring-blue-400"), 1000);
       }
     },
-    [slugify]
+    [slugify],
   );
 
   // Filter farmers based on search term and viewport
@@ -287,7 +300,7 @@ export default function Farmers() {
     let filtered = dataToFilter.filter(
       (farmer) =>
         farmer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        farmer.address.toLowerCase().includes(searchTerm.toLowerCase())
+        farmer.address.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     // If viewport filtering is enabled and we have bounds, filter by visible area
@@ -302,7 +315,7 @@ export default function Farmers() {
         try {
           const farmerLatLng = new window.google.maps.LatLng(
             farmer.lat,
-            farmer.lng
+            farmer.lng,
           );
           return viewportBounds.contains(farmerLatLng);
         } catch (error) {
@@ -344,7 +357,7 @@ export default function Farmers() {
         if (mapInstance.getZoom() < 15) mapInstance.setZoom(15);
         // Close any hover tooltips to avoid overlap
         allMarkers.forEach(
-          (m) => m._hoverInfoWindow && m._hoverInfoWindow.close()
+          (m) => m._hoverInfoWindow && m._hoverInfoWindow.close(),
         );
         // Create the singleton detail InfoWindow if needed
         if (
@@ -362,7 +375,7 @@ export default function Farmers() {
               <div style="font-weight:600;color:#0f172a;margin-bottom:4px">${
                 f.name || "Farmer"
               }</div>
-              <div style="font-size:12px;color:#475569">${(f.address || "")
+              <div style="font-size:12px;color:#475569">${(getVillage(f) || "")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")}</div>
               ${
@@ -440,7 +453,7 @@ export default function Farmers() {
             });
             marker.farmerData = f;
             return marker;
-          }
+          },
         );
       }
 
@@ -685,7 +698,7 @@ export default function Farmers() {
                     {farmer.name}
                   </h3>
                   <p className="text-sm text-slate-600 leading-relaxed">
-                    {farmer.address}
+                    {getVillage(farmer)}
                   </p>
                 </div>
               ))
